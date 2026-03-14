@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 
 from agent_layer.discovery import generate_ai_manifest, generate_json_ld
 from agent_layer.types import DiscoveryConfig

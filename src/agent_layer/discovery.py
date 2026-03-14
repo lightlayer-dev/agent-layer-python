@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from agent_layer.types import AIManifest, DiscoveryConfig
+from agent_layer.types import DiscoveryConfig
 
 
 def generate_ai_manifest(config: DiscoveryConfig) -> dict[str, Any]:

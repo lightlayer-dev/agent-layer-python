@@ -1,6 +1,5 @@
 """Integration tests for Django middleware."""
 
-import os
 import django
 from django.conf import settings
 

@@ -10,6 +10,7 @@ from agent_layer.fastapi.rate_limits import rate_limits_middleware
 from agent_layer.fastapi.llms_txt import llms_txt_routes
 from agent_layer.fastapi.discovery import discovery_routes
 from agent_layer.fastapi.auth import agent_auth_routes
+from agent_layer.fastapi.analytics import agent_analytics_middleware
 from agent_layer.fastapi.meta import agent_meta_middleware
 
 
@@ -49,5 +50,10 @@ def configure_agent_layer(app: FastAPI, config: AgentLayerConfig) -> FastAPI:
 
     if config.agent_auth:
         app.include_router(agent_auth_routes(config.agent_auth))
+
+    if config.analytics:
+        from agent_layer.analytics import AnalyticsConfig as _AC
+
+        agent_analytics_middleware(app, _AC(**config.analytics.model_dump()))
 
     return app

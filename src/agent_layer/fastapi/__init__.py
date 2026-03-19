@@ -6,6 +6,7 @@ from agent_layer.fastapi.llms_txt import llms_txt_routes
 from agent_layer.fastapi.discovery import discovery_routes
 from agent_layer.fastapi.auth import agent_auth_routes
 from agent_layer.fastapi.meta import agent_meta_middleware
+from agent_layer.fastapi.analytics import agent_analytics_middleware
 from agent_layer.fastapi.app import configure_agent_layer
 
 __all__ = [
@@ -16,5 +17,6 @@ __all__ = [
     "discovery_routes",
     "agent_auth_routes",
     "agent_meta_middleware",
+    "agent_analytics_middleware",
     "configure_agent_layer",
 ]

@@ -140,6 +140,23 @@ class AgentAuthConfig(BaseModel):
 # ── Top-level Config ────────────────────────────────────────────────────
 
 
+class AnalyticsConfigRef(BaseModel):
+    """Lightweight reference config for analytics in AgentLayerConfig.
+
+    Uses the same fields as agent_layer.analytics.AnalyticsConfig but
+    avoids circular imports. The configure_agent_layer function converts
+    this to the full AnalyticsConfig internally.
+    """
+
+    endpoint: str | None = None
+    api_key: str | None = None
+    buffer_size: int = 50
+    flush_interval_seconds: float = 30.0
+    track_all: bool = False
+
+    model_config = {"arbitrary_types_allowed": True}
+
+
 class AgentLayerConfig(BaseModel):
     errors: bool = True
     rate_limit: RateLimitConfig | None = None
@@ -147,5 +164,6 @@ class AgentLayerConfig(BaseModel):
     discovery: DiscoveryConfig | None = None
     agent_meta: AgentMetaConfig | None = None
     agent_auth: AgentAuthConfig | None = None
+    analytics: AnalyticsConfigRef | None = None
 
     model_config = {"arbitrary_types_allowed": True}

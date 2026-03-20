@@ -12,6 +12,7 @@ from agent_layer.fastapi.discovery import discovery_routes
 from agent_layer.fastapi.auth import agent_auth_routes
 from agent_layer.fastapi.analytics import agent_analytics_middleware
 from agent_layer.fastapi.meta import agent_meta_middleware
+from agent_layer.fastapi.a2a import a2a_routes
 
 
 def configure_agent_layer(app: FastAPI, config: AgentLayerConfig) -> FastAPI:
@@ -50,6 +51,9 @@ def configure_agent_layer(app: FastAPI, config: AgentLayerConfig) -> FastAPI:
 
     if config.agent_auth:
         app.include_router(agent_auth_routes(config.agent_auth))
+
+    if config.a2a:
+        app.include_router(a2a_routes(config.a2a))
 
     if config.analytics:
         from agent_layer.analytics import AnalyticsConfig as _AC

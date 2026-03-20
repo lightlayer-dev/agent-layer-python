@@ -165,5 +165,6 @@ class AgentLayerConfig(BaseModel):
     agent_meta: AgentMetaConfig | None = None
     agent_auth: AgentAuthConfig | None = None
     analytics: AnalyticsConfigRef | None = None
+    a2a: Any | None = None  # A2AConfig — avoids circular import
 
     model_config = {"arbitrary_types_allowed": True}

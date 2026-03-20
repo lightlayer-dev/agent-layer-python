@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.http import HttpResponse, JsonResponse
 from django.urls import path
 
+from agent_layer.a2a import A2AConfig, generate_agent_card
 from agent_layer.discovery import generate_ai_manifest, generate_json_ld
 from agent_layer.llms_txt import generate_llms_txt, generate_llms_full_txt
 from agent_layer.types import DiscoveryConfig, LlmsTxtConfig, RouteMetadata
@@ -51,3 +52,17 @@ def discovery_urlpatterns(config: DiscoveryConfig) -> list:
         patterns.append(path("openapi.json", openapi_spec, name="openapi_spec"))
 
     return patterns
+
+
+def a2a_urlpatterns(config: A2AConfig) -> list:
+    """Create Django URL patterns for /.well-known/agent.json."""
+    card = generate_agent_card(config)
+
+    def agent_card_view(request):
+        response = JsonResponse(card)
+        response["Cache-Control"] = "public, max-age=3600"
+        return response
+
+    return [
+        path(".well-known/agent.json", agent_card_view, name="a2a_agent_card"),
+    ]

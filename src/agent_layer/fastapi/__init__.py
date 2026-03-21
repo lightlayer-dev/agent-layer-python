@@ -8,6 +8,7 @@ from agent_layer.fastapi.auth import agent_auth_routes
 from agent_layer.fastapi.meta import agent_meta_middleware
 from agent_layer.fastapi.analytics import agent_analytics_middleware
 from agent_layer.fastapi.app import configure_agent_layer
+from agent_layer.fastapi.mcp import mcp_routes
 
 __all__ = [
     "agent_errors_middleware",
@@ -19,4 +20,5 @@ __all__ = [
     "agent_meta_middleware",
     "agent_analytics_middleware",
     "configure_agent_layer",
+    "mcp_routes",
 ]

@@ -35,6 +35,19 @@ from agent_layer.analytics import (
     create_analytics,
     detect_agent,
 )
+from agent_layer.mcp import (
+    JsonRpcRequest,
+    JsonRpcResponse,
+    McpServerConfig,
+    McpServerInfo,
+    McpToolDefinition,
+    build_input_schema,
+    format_tool_name,
+    generate_server_info,
+    generate_tool_definitions,
+    handle_json_rpc,
+    parse_tool_name,
+)
 
 __all__ = [
     "AgentError",
@@ -72,4 +85,15 @@ __all__ = [
     "A2ASkill",
     "generate_agent_card",
     "validate_agent_card",
+    "JsonRpcRequest",
+    "JsonRpcResponse",
+    "McpServerConfig",
+    "McpServerInfo",
+    "McpToolDefinition",
+    "build_input_schema",
+    "format_tool_name",
+    "generate_server_info",
+    "generate_tool_definitions",
+    "handle_json_rpc",
+    "parse_tool_name",
 ]

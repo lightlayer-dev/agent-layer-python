@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-layer"
+version = "0.1.0"
+description = "Python middleware to make your web app AI-agent-friendly — FastAPI, Flask, Django"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "LightLayer", email = "hello@lightlayer.dev" },
+]
+keywords = ["ai", "agent", "middleware", "llm", "a2a", "fastapi", "flask", "django"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.optional-dependencies]
+fastapi = ["fastapi>=0.100.0", "pydantic>=2.0.0"]
+flask = ["flask>=2.0.0"]
+django = ["django>=4.0"]
+all = ["fastapi>=0.100.0", "pydantic>=2.0.0", "flask>=2.0.0", "django>=4.0"]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "httpx>=0.24",
+    "fastapi>=0.100.0",
+    "pydantic>=2.0.0",
+    "flask>=2.0.0",
+    "django>=4.0",
+    "ruff>=0.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/lightlayer-dev/agent-layer-py"
+Repository = "https://github.com/lightlayer-dev/agent-layer-py"
+Issues = "https://github.com/lightlayer-dev/agent-layer-py/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_layer"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100

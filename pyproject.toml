@@ -44,6 +44,9 @@ dev = [
     "ruff>=0.3",
 ]
 
+[project.scripts]
+agent-layer-score = "agent_layer.score.cli:main"
+
 [project.urls]
 Homepage = "https://company.lightlayer.dev"
 Repository = "https://github.com/lightlayer-dev/agent-layer-python"

@@ -22,13 +22,12 @@ Or programmatic::
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
 from typing import Any
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 
-from agent_layer.analytics import AgentEvent, AnalyticsConfig, AnalyticsInstance, create_analytics
+from agent_layer.analytics import AnalyticsConfig, AnalyticsInstance, build_agent_event, create_analytics
 
 _instance: AnalyticsInstance | None = None
 
@@ -46,7 +45,7 @@ def get_analytics_instance() -> AnalyticsInstance:
 class AgentAnalyticsMiddleware:
     """Django middleware that detects AI agent traffic and collects analytics."""
 
-    def __init__(self, get_response: Any) -> None:
+    def __init__(self, get_response: object) -> None:
         self.get_response = get_response
         self.analytics = get_analytics_instance()
 
@@ -64,14 +63,13 @@ class AgentAnalyticsMiddleware:
 
         content_length = response.get("Content-Length")
 
-        event = AgentEvent(
-            agent=agent or "unknown",
+        event = build_agent_event(
+            agent=agent,
             user_agent=user_agent,
             method=request.method,
             path=request.path,
             status_code=response.status_code,
-            duration_ms=round(duration_ms, 2),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            duration_ms=duration_ms,
             content_type=response.get("Content-Type"),
             response_size=int(content_length) if content_length else None,
         )

@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from agent_layer.errors import rate_limit_error
-from agent_layer.rate_limit import create_rate_limiter
+from agent_layer.rate_limits import build_rate_limit_headers, create_rate_limiter
 from agent_layer.types import RateLimitConfig
 
 
@@ -34,10 +34,8 @@ class RateLimitsMiddleware(BaseHTTPMiddleware):
         else:
             response = await call_next(request)
 
-        response.headers["X-RateLimit-Limit"] = str(result.limit)
-        response.headers["X-RateLimit-Remaining"] = str(result.remaining)
-        reset_epoch = int(__import__("time").time()) + math.ceil(result.reset_ms / 1000)
-        response.headers["X-RateLimit-Reset"] = str(reset_epoch)
+        for key, value in build_rate_limit_headers(result).items():
+            response.headers[key] = value
 
         return response
 

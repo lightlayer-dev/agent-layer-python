@@ -2,21 +2,14 @@
 
 from __future__ import annotations
 
-import asyncio
-import base64
-import json
-
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse
 
+from agent_layer.async_utils import run_async_in_sync
 from agent_layer.x402 import (
     X402Config,
     HttpFacilitatorClient,
-    match_route,
-    build_payment_required,
-    encode_payment_required,
-    decode_payment_payload,
-    build_requirements,
+    process_x402_request,
     HEADER_PAYMENT_REQUIRED,
     HEADER_PAYMENT_SIGNATURE,
     HEADER_PAYMENT_RESPONSE,
@@ -40,7 +33,7 @@ class X402PaymentMiddleware:
         }
     """
 
-    def __init__(self, get_response):
+    def __init__(self, get_response: object) -> None:
         self.get_response = get_response
         x402_settings = getattr(settings, "AGENT_LAYER_X402", {})
         self.config = X402Config(**x402_settings)
@@ -49,81 +42,38 @@ class X402PaymentMiddleware:
         )
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        route_config = match_route(request.method, request.path, self.config.routes)
-        if not route_config:
-            return self.get_response(request)
-
         payment_header = request.META.get(
             f"HTTP_{HEADER_PAYMENT_SIGNATURE.upper().replace('-', '_')}"
         )
-        url = request.build_absolute_uri()
 
-        if not payment_header:
-            pr = build_payment_required(url, route_config)
-            response = JsonResponse(pr.to_camel(), status=402)
-            response[HEADER_PAYMENT_REQUIRED] = encode_payment_required(pr)
+        result = run_async_in_sync(
+            process_x402_request(
+                method=request.method,
+                path=request.path,
+                url=request.build_absolute_uri(),
+                payment_header=payment_header,
+                config=self.config,
+                facilitator=self.facilitator,
+            )
+        )
+
+        if result.action == "pass_through":
+            return self.get_response(request)
+
+        if result.action == "payment_required":
+            response = JsonResponse(result.payment_required.to_camel(), status=402)
+            response[HEADER_PAYMENT_REQUIRED] = result.encoded_header
             return response
 
-        try:
-            payload = decode_payment_payload(payment_header)
-        except ValueError:
-            pr = build_payment_required(url, route_config, "Invalid payment signature format")
-            response = JsonResponse(pr.to_camel(), status=402)
-            response[HEADER_PAYMENT_REQUIRED] = encode_payment_required(pr)
-            return response
+        if result.action == "error":
+            return JsonResponse(result.error_body, status=result.status_code)
 
-        requirements = build_requirements(route_config)
-
-        try:
-            verify_result = asyncio.run(self.facilitator.verify(payload, requirements))
-        except Exception:
-            return JsonResponse(
-                {
-                    "error": "payment_verification_failed",
-                    "message": "Could not verify payment with facilitator",
-                },
-                status=502,
-            )
-
-        if not verify_result.is_valid:
-            pr = build_payment_required(
-                url, route_config,
-                verify_result.invalid_reason or "Payment verification failed",
-            )
-            response = JsonResponse(pr.to_camel(), status=402)
-            response[HEADER_PAYMENT_REQUIRED] = encode_payment_required(pr)
-            return response
-
-        try:
-            settle_result = asyncio.run(self.facilitator.settle(payload, requirements))
-        except Exception:
-            return JsonResponse(
-                {
-                    "error": "payment_settlement_failed",
-                    "message": "Could not settle payment with facilitator",
-                },
-                status=502,
-            )
-
-        if not settle_result.success:
-            pr = build_payment_required(
-                url, route_config,
-                settle_result.error_reason or "Payment settlement failed",
-            )
-            response = JsonResponse(pr.to_camel(), status=402)
-            response[HEADER_PAYMENT_REQUIRED] = encode_payment_required(pr)
-            return response
-
-        settlement_b64 = base64.b64encode(
-            json.dumps(settle_result.model_dump(by_alias=True)).encode()
-        ).decode()
-
+        # success
         request.x402 = {  # type: ignore[attr-defined]
-            "payment": payload,
-            "settlement": settle_result,
-            "requirements": requirements,
+            "payment": result.payment_payload,
+            "settlement": result.settle_result,
+            "requirements": result.requirements,
         }
-
         response = self.get_response(request)
-        response[HEADER_PAYMENT_RESPONSE] = settlement_b64
+        response[HEADER_PAYMENT_RESPONSE] = result.settlement_b64
         return response

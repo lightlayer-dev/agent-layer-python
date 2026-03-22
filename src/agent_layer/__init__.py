@@ -68,6 +68,15 @@ from agent_layer.unified_discovery import (
     generate_unified_llms_full_txt,
     generate_unified_llms_txt,
 )
+from agent_layer.agents_txt import (
+    AgentsTxtAuth,
+    AgentsTxtConfig,
+    AgentsTxtRateLimit,
+    AgentsTxtRule,
+    generate_agents_txt as generate_standalone_agents_txt,
+    is_agent_allowed,
+    parse_agents_txt,
+)
 from agent_layer.async_utils import run_async_in_sync
 
 __all__ = [
@@ -135,4 +144,11 @@ __all__ = [
     "generate_unified_llms_full_txt",
     "generate_unified_llms_txt",
     "run_async_in_sync",
+    "AgentsTxtAuth",
+    "AgentsTxtConfig",
+    "AgentsTxtRateLimit",
+    "AgentsTxtRule",
+    "generate_standalone_agents_txt",
+    "is_agent_allowed",
+    "parse_agents_txt",
 ]

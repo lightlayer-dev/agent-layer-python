@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Awaitable, Callable, Optional
+from typing import Awaitable, Callable, Optional
 
 from fastapi import Request
 from starlette.responses import StreamingResponse

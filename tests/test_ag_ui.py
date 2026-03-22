@@ -7,7 +7,6 @@ import json
 from agent_layer.ag_ui import (
     AG_UI_HEADERS,
     AgUiEmitter,
-    CustomEvent,
     RunStartedEvent,
     TextMessageContentEvent,
     TextMessageStartEvent,
@@ -52,7 +51,7 @@ def test_emitter_text_flow():
     emitter = AgUiEmitter(chunks.append, thread_id="t1", run_id="r1")
 
     emitter.run_started()
-    mid = emitter.text_start()
+    emitter.text_start()
     emitter.text_delta("Hello ")
     emitter.text_delta("world!")
     emitter.text_end()
@@ -73,7 +72,7 @@ def test_emitter_text_message_convenience():
     chunks: list[str] = []
     emitter = AgUiEmitter(chunks.append, thread_id="t1", run_id="r1")
 
-    mid = emitter.text_message("Hello world!", role="system")
+    emitter.text_message("Hello world!", role="system")
     assert len(chunks) == 3
     assert "TEXT_MESSAGE_START" in chunks[0]
     assert "system" in chunks[0]
@@ -85,7 +84,7 @@ def test_emitter_tool_call_flow():
     chunks: list[str] = []
     emitter = AgUiEmitter(chunks.append)
 
-    tid = emitter.tool_call_start("search")
+    emitter.tool_call_start("search")
     emitter.tool_call_args('{"query": "hello"}')
     emitter.tool_call_end()
     emitter.tool_call_result('["result1", "result2"]')

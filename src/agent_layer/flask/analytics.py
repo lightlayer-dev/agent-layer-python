@@ -3,11 +3,11 @@
 Usage::
 
     from flask import Flask
-    from agent_layer.flask.analytics import agent_analytics_extension
+    from agent_layer.flask.analytics import agent_analytics_middleware
     from agent_layer.analytics import AnalyticsConfig
 
     app = Flask(__name__)
-    analytics = agent_analytics_extension(app, AnalyticsConfig(
+    analytics = agent_analytics_middleware(app, AnalyticsConfig(
         endpoint="https://dash.lightlayer.dev/api/agent-events/",
         api_key="ll_your_key",
     ))
@@ -16,14 +16,13 @@ Usage::
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
 
 from flask import Flask, g, request
 
-from agent_layer.analytics import AgentEvent, AnalyticsConfig, AnalyticsInstance, create_analytics
+from agent_layer.analytics import AnalyticsConfig, AnalyticsInstance, build_agent_event, create_analytics
 
 
-def agent_analytics_extension(
+def agent_analytics_middleware(
     app: Flask,
     config: AnalyticsConfig | None = None,
 ) -> AnalyticsInstance:
@@ -57,14 +56,13 @@ def agent_analytics_extension(
 
         content_length = response.headers.get("Content-Length")
 
-        event = AgentEvent(
-            agent=agent or "unknown",
+        event = build_agent_event(
+            agent=agent,
             user_agent=user_agent,
             method=request.method,
             path=request.path,
             status_code=response.status_code,
-            duration_ms=round(duration_ms, 2),
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            duration_ms=duration_ms,
             content_type=response.content_type,
             response_size=int(content_length) if content_length else None,
         )

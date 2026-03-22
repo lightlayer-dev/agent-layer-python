@@ -10,6 +10,7 @@ import asyncio
 import logging
 import re
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Any, Callable
 
 import httpx
@@ -174,6 +175,30 @@ class AnalyticsInstance:
 
     async def shutdown(self) -> None:
         await self.buffer.shutdown()
+
+
+def build_agent_event(
+    agent: str | None,
+    user_agent: str,
+    method: str,
+    path: str,
+    status_code: int,
+    duration_ms: float,
+    content_type: str | None = None,
+    response_size: int | None = None,
+) -> AgentEvent:
+    """Build an AgentEvent — framework-agnostic helper."""
+    return AgentEvent(
+        agent=agent or "unknown",
+        user_agent=user_agent,
+        method=method,
+        path=path,
+        status_code=status_code,
+        duration_ms=round(duration_ms, 2),
+        timestamp=datetime.now(timezone.utc).isoformat(),
+        content_type=content_type,
+        response_size=response_size,
+    )
 
 
 def create_analytics(config: AnalyticsConfig) -> AnalyticsInstance:

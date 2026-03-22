@@ -7,6 +7,14 @@ from agent_layer.fastapi.discovery import discovery_routes
 from agent_layer.fastapi.auth import agent_auth_routes
 from agent_layer.fastapi.meta import agent_meta_middleware
 from agent_layer.fastapi.analytics import agent_analytics_middleware
+from agent_layer.fastapi.agent_identity import (
+    agent_identity_middleware,
+    agent_identity_optional_middleware,
+)
+from agent_layer.fastapi.x402 import x402_middleware
+from agent_layer.fastapi.a2a import a2a_routes
+from agent_layer.fastapi.unified_discovery import unified_discovery_routes
+from agent_layer.fastapi.mcp import mcp_routes
 from agent_layer.fastapi.app import configure_agent_layer
 
 __all__ = [
@@ -18,5 +26,11 @@ __all__ = [
     "agent_auth_routes",
     "agent_meta_middleware",
     "agent_analytics_middleware",
+    "agent_identity_middleware",
+    "agent_identity_optional_middleware",
+    "x402_middleware",
+    "a2a_routes",
+    "unified_discovery_routes",
+    "mcp_routes",
     "configure_agent_layer",
 ]

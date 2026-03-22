@@ -16,13 +16,12 @@ Usage::
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
 
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
-from agent_layer.analytics import AgentEvent, AnalyticsConfig, AnalyticsInstance, create_analytics
+from agent_layer.analytics import AnalyticsConfig, AnalyticsInstance, build_agent_event, create_analytics
 
 
 def agent_analytics_middleware(
@@ -54,14 +53,13 @@ def agent_analytics_middleware(
 
             content_length = response.headers.get("content-length")
 
-            event = AgentEvent(
-                agent=agent or "unknown",
+            event = build_agent_event(
+                agent=agent,
                 user_agent=user_agent,
                 method=request.method,
                 path=str(request.url.path),
                 status_code=response.status_code,
-                duration_ms=round(duration_ms, 2),
-                timestamp=datetime.now(timezone.utc).isoformat(),
+                duration_ms=duration_ms,
                 content_type=response.headers.get("content-type"),
                 response_size=int(content_length) if content_length else None,
             )

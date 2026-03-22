@@ -14,6 +14,7 @@ from __future__ import annotations
 import base64
 import json
 import re
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 from pydantic import BaseModel, Field
@@ -246,3 +247,129 @@ def match_route(
     """Match an incoming request to a route config key."""
     key = f"{method.upper()} {path}"
     return routes.get(key)
+
+
+def encode_settlement(settle_result: SettleResponse) -> str:
+    """Encode a SettleResponse to a base64 string for the response header."""
+    return base64.b64encode(
+        json.dumps(settle_result.model_dump(by_alias=True)).encode()
+    ).decode()
+
+
+# ── Core Payment Flow ─────────────────────────────────────────────────
+
+
+@dataclass
+class X402RequestResult:
+    """Result of processing an x402 payment request."""
+
+    action: str  # "pass_through", "payment_required", "error", "success"
+    status_code: int = 200
+    payment_required: PaymentRequired | None = None
+    encoded_header: str | None = None
+    error_body: dict[str, Any] | None = None
+    settlement_b64: str | None = None
+    payment_payload: PaymentPayload | None = None
+    settle_result: SettleResponse | None = None
+    requirements: PaymentRequirements | None = None
+
+
+async def process_x402_request(
+    method: str,
+    path: str,
+    url: str,
+    payment_header: str | None,
+    config: X402Config,
+    facilitator: FacilitatorClient | None = None,
+) -> X402RequestResult:
+    """Core x402 payment flow — framework-agnostic.
+
+    Returns a result object that adapters use to build framework-specific responses.
+    """
+    route_config = match_route(method, path, config.routes)
+    if not route_config:
+        return X402RequestResult(action="pass_through")
+
+    fac = facilitator or config.facilitator or HttpFacilitatorClient(config.facilitator_url)
+
+    if not payment_header:
+        pr = build_payment_required(url, route_config)
+        return X402RequestResult(
+            action="payment_required",
+            status_code=402,
+            payment_required=pr,
+            encoded_header=encode_payment_required(pr),
+        )
+
+    try:
+        payload = decode_payment_payload(payment_header)
+    except ValueError:
+        pr = build_payment_required(url, route_config, "Invalid payment signature format")
+        return X402RequestResult(
+            action="payment_required",
+            status_code=402,
+            payment_required=pr,
+            encoded_header=encode_payment_required(pr),
+        )
+
+    requirements = build_requirements(route_config)
+
+    # Verify
+    try:
+        verify_result = await fac.verify(payload, requirements)
+    except Exception:
+        return X402RequestResult(
+            action="error",
+            status_code=502,
+            error_body={
+                "error": "payment_verification_failed",
+                "message": "Could not verify payment with facilitator",
+            },
+        )
+
+    if not verify_result.is_valid:
+        pr = build_payment_required(
+            url,
+            route_config,
+            verify_result.invalid_reason or "Payment verification failed",
+        )
+        return X402RequestResult(
+            action="payment_required",
+            status_code=402,
+            payment_required=pr,
+            encoded_header=encode_payment_required(pr),
+        )
+
+    # Settle
+    try:
+        settle_result = await fac.settle(payload, requirements)
+    except Exception:
+        return X402RequestResult(
+            action="error",
+            status_code=502,
+            error_body={
+                "error": "payment_settlement_failed",
+                "message": "Could not settle payment with facilitator",
+            },
+        )
+
+    if not settle_result.success:
+        pr = build_payment_required(
+            url,
+            route_config,
+            settle_result.error_reason or "Payment settlement failed",
+        )
+        return X402RequestResult(
+            action="payment_required",
+            status_code=402,
+            payment_required=pr,
+            encoded_header=encode_payment_required(pr),
+        )
+
+    return X402RequestResult(
+        action="success",
+        settlement_b64=encode_settlement(settle_result),
+        payment_payload=payload,
+        settle_result=settle_result,
+        requirements=requirements,
+    )

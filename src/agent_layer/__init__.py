@@ -1,7 +1,7 @@
 """agent-layer — Make web apps AI-agent-friendly."""
 
 from agent_layer.errors import AgentError, format_error, not_found_error, rate_limit_error
-from agent_layer.rate_limit import MemoryStore, create_rate_limiter
+from agent_layer.rate_limits import MemoryStore, build_rate_limit_headers, create_rate_limiter
 from agent_layer.llms_txt import generate_llms_txt, generate_llms_full_txt
 from agent_layer.discovery import generate_ai_manifest, generate_json_ld
 from agent_layer.a2a import (
@@ -17,12 +17,15 @@ from agent_layer.agent_identity import (
     AgentIdentityConfig,
     AuthzContext,
     AuthzResult,
+    IdentityResult,
     SpiffeId,
     TokenValidationError,
     build_audit_event,
+    check_identity,
     decode_jwt_claims,
     evaluate_authz,
     extract_claims,
+    extract_token_from_header,
     is_spiffe_trusted,
     parse_spiffe_id,
     validate_claims,
@@ -32,9 +35,40 @@ from agent_layer.analytics import (
     AnalyticsConfig,
     AnalyticsInstance,
     EventBuffer,
+    build_agent_event,
     create_analytics,
     detect_agent,
 )
+from agent_layer.mcp import (
+    JsonRpcRequest,
+    JsonRpcResponse,
+    McpServerConfig,
+    McpServerInfo,
+    McpToolDefinition,
+    build_input_schema,
+    format_tool_name,
+    generate_server_info,
+    generate_tool_definitions,
+    handle_json_rpc,
+    parse_tool_name,
+)
+from agent_layer.x402 import (
+    X402Config,
+    X402RequestResult,
+    X402RouteConfig,
+    encode_settlement,
+    process_x402_request,
+)
+from agent_layer.unified_discovery import (
+    UnifiedDiscoveryConfig,
+    generate_agents_txt,
+    generate_all_discovery,
+    generate_unified_agent_card,
+    generate_unified_ai_manifest,
+    generate_unified_llms_full_txt,
+    generate_unified_llms_txt,
+)
+from agent_layer.async_utils import run_async_in_sync
 
 __all__ = [
     "AgentError",
@@ -42,6 +76,7 @@ __all__ = [
     "not_found_error",
     "rate_limit_error",
     "MemoryStore",
+    "build_rate_limit_headers",
     "create_rate_limiter",
     "generate_llms_txt",
     "generate_llms_full_txt",
@@ -51,6 +86,7 @@ __all__ = [
     "AnalyticsConfig",
     "AnalyticsInstance",
     "EventBuffer",
+    "build_agent_event",
     "create_analytics",
     "detect_agent",
     "AgentAuthzPolicyRuntime",
@@ -58,12 +94,15 @@ __all__ = [
     "AgentIdentityConfig",
     "AuthzContext",
     "AuthzResult",
+    "IdentityResult",
     "SpiffeId",
     "TokenValidationError",
     "build_audit_event",
+    "check_identity",
     "decode_jwt_claims",
     "evaluate_authz",
     "extract_claims",
+    "extract_token_from_header",
     "is_spiffe_trusted",
     "parse_spiffe_id",
     "validate_claims",
@@ -72,4 +111,28 @@ __all__ = [
     "A2ASkill",
     "generate_agent_card",
     "validate_agent_card",
+    "JsonRpcRequest",
+    "JsonRpcResponse",
+    "McpServerConfig",
+    "McpServerInfo",
+    "McpToolDefinition",
+    "build_input_schema",
+    "format_tool_name",
+    "generate_server_info",
+    "generate_tool_definitions",
+    "handle_json_rpc",
+    "parse_tool_name",
+    "X402Config",
+    "X402RequestResult",
+    "X402RouteConfig",
+    "encode_settlement",
+    "process_x402_request",
+    "UnifiedDiscoveryConfig",
+    "generate_agents_txt",
+    "generate_all_discovery",
+    "generate_unified_agent_card",
+    "generate_unified_ai_manifest",
+    "generate_unified_llms_full_txt",
+    "generate_unified_llms_txt",
+    "run_async_in_sync",
 ]

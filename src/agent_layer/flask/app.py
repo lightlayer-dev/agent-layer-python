@@ -9,6 +9,9 @@ from agent_layer.flask.errors import agent_errors_handler
 from agent_layer.flask.rate_limits import rate_limits_middleware
 from agent_layer.flask.llms_txt import llms_txt_blueprint
 from agent_layer.flask.discovery import discovery_blueprint
+from agent_layer.flask.auth import agent_auth_blueprint
+from agent_layer.flask.meta import agent_meta_middleware
+from agent_layer.flask.a2a import a2a_blueprint
 
 
 def configure_agent_layer(app: Flask, config: AgentLayerConfig) -> Flask:
@@ -32,10 +35,25 @@ def configure_agent_layer(app: Flask, config: AgentLayerConfig) -> Flask:
     if config.rate_limit:
         rate_limits_middleware(app, config.rate_limit)
 
+    if config.agent_meta:
+        agent_meta_middleware(app, config.agent_meta)
+
     if config.llms_txt:
         app.register_blueprint(llms_txt_blueprint(config.llms_txt))
 
     if config.discovery:
         app.register_blueprint(discovery_blueprint(config.discovery))
+
+    if config.agent_auth:
+        app.register_blueprint(agent_auth_blueprint(config.agent_auth))
+
+    if config.a2a:
+        app.register_blueprint(a2a_blueprint(config.a2a))
+
+    if config.analytics:
+        from agent_layer.analytics import AnalyticsConfig as _AC
+        from agent_layer.flask.analytics import agent_analytics_middleware
+
+        agent_analytics_middleware(app, _AC(**config.analytics.model_dump()))
 
     return app

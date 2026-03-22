@@ -387,3 +387,84 @@ def build_audit_event(
         path=context.path,
         authz_result=authz_result,
     )
+
+
+# ── Token Extraction ────────────────────────────────────────────────────
+
+
+def extract_token_from_header(raw_header: str | None, prefix: str) -> str | None:
+    """Extract a bearer token from a raw Authorization header value."""
+    if not raw_header:
+        return None
+    if raw_header.startswith(prefix + " "):
+        return raw_header[len(prefix) + 1 :]
+    return raw_header
+
+
+# ── Core Identity Check ────────────────────────────────────────────────
+
+
+@dataclass
+class IdentityResult:
+    """Result of a core identity verification check."""
+
+    ok: bool
+    claims: AgentIdentityClaims | None = None
+    error_body: dict[str, Any] | None = None
+    error_status: int = 401
+
+
+def check_identity(
+    token: str | None,
+    config: AgentIdentityConfig,
+    decoded_claims: AgentIdentityClaims | None = None,
+    method: str = "",
+    path: str = "",
+    headers: dict[str, Any] | None = None,
+    runtime_policies: list[AgentAuthzPolicyRuntime] | None = None,
+) -> IdentityResult:
+    """Core identity check — framework-agnostic.
+
+    Either provide ``decoded_claims`` (from an async verifier) or just a
+    ``token`` (will be decoded via :func:`decode_jwt_claims`).
+
+    Returns an :class:`IdentityResult` that adapters use to build
+    framework-specific responses.
+    """
+    from agent_layer.errors import format_error
+    from agent_layer.types import AgentErrorOptions
+
+    def _err(code: str, message: str, status: int) -> IdentityResult:
+        envelope = format_error(AgentErrorOptions(code=code, message=message, status=status))
+        return IdentityResult(
+            ok=False,
+            error_body={"error": envelope.model_dump(exclude_none=True)},
+            error_status=status,
+        )
+
+    if token is None:
+        return _err("agent_identity_required", "Agent identity token is required.", 401)
+
+    claims = decoded_claims
+    if claims is None:
+        payload = decode_jwt_claims(token)
+        if payload is None:
+            return _err("malformed_token", "Agent identity token is malformed.", 401)
+        claims = extract_claims(payload)
+
+    validation_error = validate_claims(claims, config)
+    if validation_error:
+        status = 401 if validation_error.code == "expired_token" else 403
+        return _err(validation_error.code, validation_error.message, status)
+
+    if runtime_policies:
+        context = AuthzContext(method=method, path=path, headers=headers or {})
+        result = evaluate_authz(claims, context, runtime_policies, config.default_policy)
+        if not result.allowed:
+            return _err(
+                "agent_unauthorized",
+                result.denied_reason or "Agent is not authorized.",
+                403,
+            )
+
+    return IdentityResult(ok=True, claims=claims)

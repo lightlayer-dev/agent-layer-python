@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import time
 from typing import Any, Callable
 
@@ -69,3 +70,13 @@ def create_rate_limiter(config: RateLimitConfig) -> Callable[[Any], Any]:
         return result
 
     return check_rate_limit
+
+
+def build_rate_limit_headers(result: RateLimitResult) -> dict[str, str]:
+    """Build standard X-RateLimit-* headers from a rate limit result."""
+    reset_epoch = int(time.time()) + math.ceil(result.reset_ms / 1000)
+    return {
+        "X-RateLimit-Limit": str(result.limit),
+        "X-RateLimit-Remaining": str(result.remaining),
+        "X-RateLimit-Reset": str(reset_epoch),
+    }

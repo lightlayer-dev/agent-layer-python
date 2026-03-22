@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Callable
 
 from django.http import HttpRequest, HttpResponse, JsonResponse

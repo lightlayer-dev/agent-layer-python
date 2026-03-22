@@ -12,7 +12,7 @@ tools/call per the MCP specification.
 from __future__ import annotations
 
 import re
-from typing import Any, Awaitable, Callable, Protocol
+from typing import Any, Awaitable, Callable
 
 from pydantic import BaseModel, Field
 

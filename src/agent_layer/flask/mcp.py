@@ -10,7 +10,7 @@ import json
 import uuid
 from typing import Any
 
-from flask import Blueprint, Response, jsonify, make_response, request
+from flask import Blueprint, Response, jsonify, request
 
 from agent_layer.async_utils import run_async_in_sync
 from agent_layer.mcp import (

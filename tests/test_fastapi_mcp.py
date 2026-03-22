@@ -147,5 +147,4 @@ class TestCustomToolCallHandler:
             "params": {"name": "get_api_items", "arguments": {}}
         })
         assert resp.status_code == 200
-        import json
         assert "Custom: get_api_items" in resp.json()["result"]["content"][0]["text"]

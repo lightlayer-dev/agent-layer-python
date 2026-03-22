@@ -4,12 +4,10 @@ import base64
 import json
 import time
 
-import pytest
 from flask import Flask
 
 from agent_layer.a2a import A2AAgentCard, A2AConfig
 from agent_layer.agent_identity import AgentIdentityConfig
-from agent_layer.analytics import AnalyticsConfig, AgentEvent
 from agent_layer.mcp import McpServerConfig
 from agent_layer.types import AgentAuthConfig, AgentMetaConfig, RouteMetadata
 from agent_layer.unified_discovery import UnifiedDiscoveryConfig

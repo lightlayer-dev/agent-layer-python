@@ -7,8 +7,6 @@ from unittest.mock import AsyncMock
 import pytest
 
 from agent_layer.x402 import (
-    PaymentPayload,
-    PaymentRequirements,
     SettleResponse,
     VerifyResponse,
     X402Config,

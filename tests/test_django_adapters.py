@@ -27,18 +27,15 @@ if not settings.configured:
     )
     django.setup()
 
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.test import RequestFactory, TestCase
 from django.urls import path
 
-from agent_layer.a2a import A2AAgentCard, A2AConfig
-from agent_layer.agent_identity import AgentIdentityConfig
 from agent_layer.errors import AgentError
 from agent_layer.mcp import McpServerConfig
 from agent_layer.types import (
     AgentAuthConfig,
     AgentErrorOptions,
-    AgentMetaConfig,
     AIManifest,
     DiscoveryConfig,
     LlmsTxtConfig,
@@ -55,10 +52,10 @@ def _make_jwt(payload: dict) -> str:
 
 # ── Shared views ──────────────────────────────────────────────────────
 
-from agent_layer.django.auth import agent_auth_urlpatterns
-from agent_layer.django.unified_discovery import unified_discovery_urlpatterns
-from agent_layer.django.mcp import mcp_urlpatterns
-from agent_layer.django.views import a2a_urlpatterns, discovery_urlpatterns, llms_txt_urlpatterns
+from agent_layer.django.auth import agent_auth_urlpatterns  # noqa: E402
+from agent_layer.django.unified_discovery import unified_discovery_urlpatterns  # noqa: E402
+from agent_layer.django.mcp import mcp_urlpatterns  # noqa: E402
+from agent_layer.django.views import discovery_urlpatterns, llms_txt_urlpatterns  # noqa: E402
 
 _auth_config = AgentAuthConfig(
     issuer="https://auth.example.com",

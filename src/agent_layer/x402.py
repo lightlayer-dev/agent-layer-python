@@ -14,8 +14,8 @@ from __future__ import annotations
 import base64
 import json
 import re
-from dataclasses import dataclass, field as dc_field
-from typing import Any, Literal, Protocol
+from dataclasses import dataclass
+from typing import Any, Protocol
 
 from pydantic import BaseModel, Field
 

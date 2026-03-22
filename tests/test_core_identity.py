@@ -9,7 +9,6 @@ import pytest
 from agent_layer.agent_identity import (
     AgentIdentityConfig,
     AgentAuthzPolicyRuntime,
-    IdentityResult,
     check_identity,
     extract_token_from_header,
 )

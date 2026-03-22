@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import asyncio
 import json
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 from agent_layer.score.types import CheckResult, ScanConfig, ScoreReport
 from agent_layer.score.scanner import scan

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from urllib.parse import quote
 
-from .types import ScoreReport, CheckResult
+from .types import ScoreReport
 
 
 def _icon(severity: str) -> str:

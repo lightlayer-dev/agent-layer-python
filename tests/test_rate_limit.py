@@ -2,7 +2,7 @@
 
 import pytest
 
-from agent_layer.rate_limit import MemoryStore, create_rate_limiter
+from agent_layer.rate_limits import MemoryStore, create_rate_limiter
 from agent_layer.types import RateLimitConfig
 
 

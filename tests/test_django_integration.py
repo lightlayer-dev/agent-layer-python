@@ -3,12 +3,12 @@
 import django
 from django.conf import settings
 
-# Minimal Django config for testing
+# Minimal Django config for testing — check if already configured by another test
 if not settings.configured:
     settings.configure(
         DEBUG=True,
         DATABASES={"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}},
-        ROOT_URLCONF="tests.test_django_integration",
+        ROOT_URLCONF="tests.test_django_adapters",
         MIDDLEWARE=[
             "agent_layer.django.errors.AgentErrorsMiddleware",
             "agent_layer.django.rate_limits.RateLimitsMiddleware",
@@ -20,40 +20,11 @@ if not settings.configured:
 
 from django.http import JsonResponse
 from django.test import RequestFactory, TestCase
-from django.urls import path
 
 from agent_layer.errors import AgentError
-from agent_layer.types import (
-    AgentErrorOptions,
-    AIManifest,
-    DiscoveryConfig,
-    LlmsTxtConfig,
-)
+from agent_layer.types import AgentErrorOptions
 from agent_layer.django.errors import AgentErrorsMiddleware
 from agent_layer.django.rate_limits import RateLimitsMiddleware
-from agent_layer.django.views import llms_txt_urlpatterns, discovery_urlpatterns
-
-
-# ── Test views ──────────────────────────────────────────────────────────
-
-def ok_view(request):
-    return JsonResponse({"status": "ok"})
-
-
-def fail_view(request):
-    raise AgentError(AgentErrorOptions(code="broken", message="It broke", status=500))
-
-
-# URL patterns (used by ROOT_URLCONF)
-_llms_config = LlmsTxtConfig(title="Test API", description="For testing")
-_discovery_config = DiscoveryConfig(manifest=AIManifest(name="Test API"))
-
-urlpatterns = [
-    path("ok", ok_view),
-    path("fail", fail_view),
-    *llms_txt_urlpatterns(_llms_config),
-    *discovery_urlpatterns(_discovery_config),
-]
 
 
 # ── Tests ───────────────────────────────────────────────────────────────

@@ -199,11 +199,11 @@ class TestFlaskAnalytics:
     def test_agent_request_recorded(self) -> None:
         from flask import Flask
 
-        from agent_layer.flask.analytics import agent_analytics_extension
+        from agent_layer.flask.analytics import agent_analytics_middleware
 
         events: list[AgentEvent] = []
         app = Flask(__name__)
-        agent_analytics_extension(app, AnalyticsConfig(on_event=events.append))
+        agent_analytics_middleware(app, AnalyticsConfig(on_event=events.append))
 
         @app.get("/hello")
         def hello() -> dict[str, str]:
@@ -219,11 +219,11 @@ class TestFlaskAnalytics:
     def test_browser_not_recorded(self) -> None:
         from flask import Flask
 
-        from agent_layer.flask.analytics import agent_analytics_extension
+        from agent_layer.flask.analytics import agent_analytics_middleware
 
         events: list[AgentEvent] = []
         app = Flask(__name__)
-        agent_analytics_extension(app, AnalyticsConfig(on_event=events.append))
+        agent_analytics_middleware(app, AnalyticsConfig(on_event=events.append))
 
         @app.get("/hello")
         def hello() -> dict[str, str]:

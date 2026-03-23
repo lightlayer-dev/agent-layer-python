@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 
 import django
 from django.conf import settings
@@ -19,7 +18,7 @@ if not settings.configured:
     django.setup()
 
 import pytest
-from django.http import HttpRequest, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.test import RequestFactory
 
 from agent_layer.django.ag_ui import ag_ui_stream, AgUiMiddlewareOptions

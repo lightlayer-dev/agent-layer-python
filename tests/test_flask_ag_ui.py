@@ -66,7 +66,6 @@ def test_ag_ui_stream_sse_headers(app):
 
 def test_ag_ui_stream_thread_id_from_body(app):
     """Test that threadId is extracted from request body."""
-    events = []
 
     def handler(request, emit):
         emit.run_started()

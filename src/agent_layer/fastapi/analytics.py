@@ -2,20 +2,27 @@
 
 Usage::
 
+    from contextlib import asynccontextmanager
     from fastapi import FastAPI
     from agent_layer.fastapi.analytics import agent_analytics_middleware
-    from agent_layer.analytics import AnalyticsConfig
 
-    app = FastAPI()
-    analytics = agent_analytics_middleware(app, AnalyticsConfig(
-        endpoint="https://dash.lightlayer.dev/api/agent-events/",
-        api_key="ll_your_key",
-    ))
+    analytics_instance = None
+
+    @asynccontextmanager
+    async def lifespan(app):
+        nonlocal analytics_instance
+        analytics_instance = agent_analytics_middleware(app)
+        yield
+        await analytics_instance.shutdown()
+
+    app = FastAPI(lifespan=lifespan)
 """
 
 from __future__ import annotations
 
 import time
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
@@ -30,7 +37,13 @@ def agent_analytics_middleware(
 ) -> AnalyticsInstance:
     """Add agent analytics middleware to a FastAPI/Starlette app.
 
-    Returns the AnalyticsInstance for manual flush/shutdown.
+    Returns the AnalyticsInstance so callers can manage its lifecycle
+    via lifespan handlers. Call ``instance.buffer.start_flush_timer()``
+    on startup and ``await instance.shutdown()`` on shutdown.
+
+    For apps **without** a custom lifespan, the middleware registers
+    lifespan hooks automatically. If the app already has a lifespan,
+    manage the instance yourself (see module docstring).
     """
     from fastapi import FastAPI
 
@@ -70,13 +83,20 @@ def agent_analytics_middleware(
     assert isinstance(app, FastAPI), "app must be a FastAPI instance"
     app.add_middleware(_AnalyticsMiddleware)
 
-    # Start periodic flush on app startup
-    @app.on_event("startup")  # type: ignore[union-attr]
-    async def _start_flush() -> None:
-        instance.buffer.start_flush_timer()
+    # If the app has no custom lifespan, wrap the existing one to add
+    # startup/shutdown hooks without using the deprecated on_event API.
+    existing_lifespan = app.router.lifespan_context
 
-    @app.on_event("shutdown")  # type: ignore[union-attr]
-    async def _shutdown_analytics() -> None:
+    @asynccontextmanager
+    async def _analytics_lifespan(app_: FastAPI) -> AsyncGenerator[dict, None]:  # type: ignore[type-arg]
+        instance.buffer.start_flush_timer()
+        if existing_lifespan is not None:
+            async with existing_lifespan(app_) as state:
+                yield state or {}
+        else:
+            yield {}
         await instance.shutdown()
+
+    app.router.lifespan_context = _analytics_lifespan  # type: ignore[assignment]
 
     return instance

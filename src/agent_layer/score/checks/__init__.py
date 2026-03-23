@@ -11,6 +11,8 @@ from .cors import check_cors
 from .security_headers import check_security_headers
 from .response_time import check_response_time
 from .x402 import check_x402
+from .agents_txt import check_agents_txt
+from .ag_ui import check_ag_ui
 
 from ..types import CheckFn
 
@@ -26,6 +28,8 @@ all_checks: list[CheckFn] = [
     check_security_headers,
     check_response_time,
     check_x402,
+    check_agents_txt,
+    check_ag_ui,
 ]
 
 __all__ = [
@@ -41,4 +45,6 @@ __all__ = [
     "check_security_headers",
     "check_response_time",
     "check_x402",
+    "check_agents_txt",
+    "check_ag_ui",
 ]

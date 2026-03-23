@@ -10,6 +10,7 @@ from agent_layer.django.views import a2a_urlpatterns, discovery_urlpatterns, llm
 from agent_layer.django.auth import agent_auth_urlpatterns
 from agent_layer.django.mcp import mcp_urlpatterns
 from agent_layer.django.unified_discovery import unified_discovery_urlpatterns
+from agent_layer.django.ag_ui import ag_ui_stream as django_ag_ui_stream
 from agent_layer.django.app import configure_agent_layer
 
 __all__ = [
@@ -25,5 +26,6 @@ __all__ = [
     "llms_txt_urlpatterns",
     "mcp_urlpatterns",
     "unified_discovery_urlpatterns",
+    "django_ag_ui_stream",
     "configure_agent_layer",
 ]

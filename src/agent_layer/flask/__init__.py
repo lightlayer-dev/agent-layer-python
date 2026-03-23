@@ -12,6 +12,7 @@ from agent_layer.flask.x402 import x402_middleware
 from agent_layer.flask.a2a import a2a_blueprint
 from agent_layer.flask.mcp import mcp_blueprint
 from agent_layer.flask.unified_discovery import unified_discovery_blueprint
+from agent_layer.flask.ag_ui import ag_ui_stream as flask_ag_ui_stream
 from agent_layer.flask.app import configure_agent_layer
 
 __all__ = [
@@ -27,5 +28,6 @@ __all__ = [
     "a2a_blueprint",
     "mcp_blueprint",
     "unified_discovery_blueprint",
+    "flask_ag_ui_stream",
     "configure_agent_layer",
 ]

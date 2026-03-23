@@ -28,16 +28,16 @@ async def check_agents_txt(config: ScanConfig) -> CheckResult:
 
     body = res.text
     lines = [
-        l.strip()
-        for l in body.split("\n")
-        if l.strip() and not l.strip().startswith("#")
+        line.strip()
+        for line in body.split("\n")
+        if line.strip() and not line.strip().startswith("#")
     ]
 
-    has_user_agent = any(l.lower().startswith("user-agent:") for l in lines)
-    has_allow = any(l.lower().startswith("allow:") for l in lines)
-    has_disallow = any(l.lower().startswith("disallow:") for l in lines)
-    has_auth = any(l.lower().startswith("auth:") for l in lines)
-    has_rate_limit = any(l.lower().startswith("rate-limit:") for l in lines)
+    has_user_agent = any(line.lower().startswith("user-agent:") for line in lines)
+    has_allow = any(line.lower().startswith("allow:") for line in lines)
+    has_disallow = any(line.lower().startswith("disallow:") for line in lines)
+    has_auth = any(line.lower().startswith("auth:") for line in lines)
+    has_rate_limit = any(line.lower().startswith("rate-limit:") for line in lines)
 
     features: list[str] = []
     if has_user_agent:

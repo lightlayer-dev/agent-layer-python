@@ -36,6 +36,7 @@ Drop-in support for agent discovery, payments, identity verification, analytics,
 | **meta** | Agent capability headers (`X-Agent-Meta`) | ✅ | ✅ | ✅ |
 | **mcp** | Model Context Protocol server (JSON-RPC + Streamable HTTP) | ✅ | ✅ | ✅ |
 | **unified_discovery** | Single config → all discovery formats at once | ✅ | ✅ | ✅ |
+| **ag_ui** | AG-UI SSE streaming ([docs.ag-ui.com](https://docs.ag-ui.com)) — CopilotKit/ADK frontend protocol | ✅ | ✅ | ✅ |
 
 ---
 

@@ -59,6 +59,12 @@ from agent_layer.x402 import (
     encode_settlement,
     process_x402_request,
 )
+from agent_layer.x402_client import (
+    WalletSigner,
+    extract_payment_requirements,
+    is_payment_required,
+    wrap_request_with_payment,
+)
 from agent_layer.unified_discovery import (
     UnifiedDiscoveryConfig,
     generate_agents_txt,
@@ -144,6 +150,10 @@ __all__ = [
     "generate_unified_llms_full_txt",
     "generate_unified_llms_txt",
     "run_async_in_sync",
+    "WalletSigner",
+    "extract_payment_requirements",
+    "is_payment_required",
+    "wrap_request_with_payment",
     "AgentsTxtAuth",
     "AgentsTxtConfig",
     "AgentsTxtRateLimit",

@@ -2,29 +2,24 @@
 
 from __future__ import annotations
 
+import json
 from typing import Callable, Optional
 
 from django.http import HttpRequest, StreamingHttpResponse
 
-from agent_layer.ag_ui import AG_UI_HEADERS, AgUiEmitter
+from agent_layer.ag_ui import (
+    AG_UI_HEADERS,
+    AgUiEmitter,
+    AgUiMiddlewareOptionsBase,
+    orchestrate_stream,
+)
 
 
 AgUiStreamHandler = Callable[[HttpRequest, AgUiEmitter], None]
 
 
-class AgUiMiddlewareOptions:
+class AgUiMiddlewareOptions(AgUiMiddlewareOptionsBase):
     """Options for the AG-UI stream view."""
-
-    def __init__(
-        self,
-        *,
-        thread_id: Optional[str] = None,
-        run_id: Optional[str] = None,
-        on_error: Optional[Callable[[Exception, AgUiEmitter], None]] = None,
-    ):
-        self.thread_id = thread_id
-        self.run_id = run_id
-        self.on_error = on_error
 
 
 def ag_ui_stream(
@@ -52,32 +47,20 @@ def ag_ui_stream(
     opts = options or AgUiMiddlewareOptions()
 
     def view(request: HttpRequest) -> StreamingHttpResponse:
-        import json
-
-        chunks: list[str] = []
-
         # Try to extract threadId from request body
-        thread_id = opts.thread_id
-        if thread_id is None:
-            try:
-                body = json.loads(request.body)
-                thread_id = body.get("threadId")
-            except Exception:
-                pass
-
-        emitter = AgUiEmitter(
-            lambda chunk: chunks.append(chunk),
-            thread_id=thread_id,
-            run_id=opts.run_id,
-        )
-
+        thread_id_from_body = None
         try:
-            handler(request, emitter)
-        except Exception as err:
-            if opts.on_error:
-                opts.on_error(err, emitter)
-            else:
-                emitter.run_error(str(err))
+            body = json.loads(request.body)
+            thread_id_from_body = body.get("threadId")
+        except Exception:
+            pass
+
+        chunks = orchestrate_stream(
+            handler=handler,
+            request_obj=request,
+            thread_id_from_body=thread_id_from_body,
+            opts=opts,
+        )
 
         def generate():
             for chunk in chunks:

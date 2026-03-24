@@ -155,6 +155,10 @@ class EventBuffer:
             self._task = None
         await self.flush()
 
+    async def stop(self) -> None:
+        """Alias for shutdown() — stop the flush timer and flush remaining events."""
+        await self.shutdown()
+
 
 # ── Analytics Instance ──────────────────────────────────────────────────
 

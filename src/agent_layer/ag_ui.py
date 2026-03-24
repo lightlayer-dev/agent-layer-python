@@ -352,3 +352,91 @@ class AgUiEmitter:
 
     def custom(self, name: str, value: Any) -> None:
         self.emit(CustomEvent(name=name, value=value))
+
+
+# ── Shared stream orchestration ──────────────────────────────────────────
+
+
+@dataclass
+class AgUiMiddlewareOptionsBase:
+    """Framework-agnostic options for the AG-UI stream middleware."""
+
+    thread_id: Optional[str] = None
+    run_id: Optional[str] = None
+    on_error: Optional[Callable[[Exception, AgUiEmitter], None]] = None
+
+
+def orchestrate_stream(
+    *,
+    handler: Callable[..., Any],
+    request_obj: Any,
+    thread_id_from_body: Optional[str] = None,
+    opts: AgUiMiddlewareOptionsBase | None = None,
+    is_async: bool = False,
+) -> list[str]:
+    """Run the AG-UI handler and collect SSE chunks.
+
+    Args:
+        handler: The user-provided stream handler (sync or async).
+        request_obj: The framework request object passed to the handler.
+        thread_id_from_body: Thread ID extracted from the request body, if any.
+        opts: Middleware options.
+        is_async: If True, the handler is awaited (must be called from an async context via await).
+
+    Returns:
+        List of SSE-encoded chunks.
+    """
+    opts = opts or AgUiMiddlewareOptionsBase()
+    chunks: list[str] = []
+
+    thread_id = opts.thread_id or thread_id_from_body
+
+    emitter = AgUiEmitter(
+        lambda chunk: chunks.append(chunk),
+        thread_id=thread_id,
+        run_id=opts.run_id,
+    )
+
+    try:
+        if is_async:
+            import asyncio
+            asyncio.get_event_loop().run_until_complete(handler(request_obj, emitter))
+        else:
+            handler(request_obj, emitter)
+    except Exception as err:
+        if opts.on_error:
+            opts.on_error(err, emitter)
+        else:
+            emitter.run_error(str(err))
+
+    return chunks
+
+
+async def orchestrate_stream_async(
+    *,
+    handler: Callable[..., Any],
+    request_obj: Any,
+    thread_id_from_body: Optional[str] = None,
+    opts: AgUiMiddlewareOptionsBase | None = None,
+) -> list[str]:
+    """Async version of orchestrate_stream."""
+    opts = opts or AgUiMiddlewareOptionsBase()
+    chunks: list[str] = []
+
+    thread_id = opts.thread_id or thread_id_from_body
+
+    emitter = AgUiEmitter(
+        lambda chunk: chunks.append(chunk),
+        thread_id=thread_id,
+        run_id=opts.run_id,
+    )
+
+    try:
+        await handler(request_obj, emitter)
+    except Exception as err:
+        if opts.on_error:
+            opts.on_error(err, emitter)
+        else:
+            emitter.run_error(str(err))
+
+    return chunks

@@ -47,7 +47,7 @@ for check in report.checks:
         print(f"    💡 {check.suggestion}")
 ```
 
-## Checks (11 total)
+## Checks (13 total)
 
 | Check | What it measures | Max Score |
 |-------|-----------------|-----------|
@@ -62,6 +62,8 @@ for check in report.checks:
 | Security Headers | Security headers present but not blocking | 10 |
 | Response Time | Fast response times | 10 |
 | x402 Agent Payments | x402 micropayment protocol support | 10 |
+| agents.txt | /agents.txt discovery and agent registration | 10 |
+| AG-UI | AG-UI streaming protocol support | 10 |
 
 ## CI Integration
 

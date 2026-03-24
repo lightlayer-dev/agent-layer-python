@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any
 
 from django.http import HttpRequest, HttpResponse, JsonResponse, StreamingHttpResponse
 from django.urls import path
@@ -20,10 +19,11 @@ from agent_layer.mcp import (
     McpServerConfig,
     McpToolDefinition,
     ToolCallHandler,
+    build_tool_route_map,
     generate_server_info,
     generate_tool_definitions,
     handle_json_rpc,
-    parse_tool_name,
+    make_default_tool_call_handler,
 )
 
 
@@ -46,61 +46,8 @@ def mcp_urlpatterns(
     manual_tools = config.tools or []
     all_tools: list[McpToolDefinition] = [*auto_tools, *manual_tools]
 
-    # Map tool names to their original route info for internal dispatch
-    tool_route_map: dict[str, dict[str, str]] = {}
-    if config.routes:
-        for i, route in enumerate(config.routes):
-            if i < len(auto_tools):
-                tool_route_map[auto_tools[i].name] = {
-                    "method": route.method.upper(),
-                    "path": route.path,
-                }
-
-    async def default_tool_call_handler(
-        tool_name: str, args: dict[str, Any]
-    ) -> dict[str, Any]:
-        """Default tool call handler — returns route dispatch info."""
-        route_info = tool_route_map.get(tool_name)
-        if not route_info:
-            parsed = parse_tool_name(tool_name)
-            return {
-                "content": [
-                    {
-                        "type": "text",
-                        "text": json.dumps(
-                            {"error": f"No route handler for tool: {tool_name}", "parsed": parsed}
-                        ),
-                    }
-                ]
-            }
-
-        resolved_path = route_info["path"]
-        query_params: dict[str, str] = {}
-        body_params: dict[str, Any] = {}
-
-        for key, value in args.items():
-            param_pattern = f":{key}"
-            if param_pattern in resolved_path:
-                resolved_path = resolved_path.replace(param_pattern, str(value))
-            elif route_info["method"] in ("GET", "DELETE"):
-                query_params[key] = str(value)
-            else:
-                body_params[key] = value
-
-        qs = "&".join(f"{k}={v}" for k, v in query_params.items())
-        url = f"{resolved_path}?{qs}" if qs else resolved_path
-
-        result: dict[str, Any] = {
-            "tool": tool_name,
-            "method": route_info["method"],
-            "url": url,
-        }
-        if body_params:
-            result["body"] = body_params
-
-        return {"content": [{"type": "text", "text": json.dumps(result)}]}
-
-    handler = tool_call_handler or default_tool_call_handler
+    tool_route_map = build_tool_route_map(config.routes, auto_tools)
+    handler = tool_call_handler or make_default_tool_call_handler(tool_route_map)
 
     @csrf_exempt
     def mcp_view(request: HttpRequest) -> HttpResponse:

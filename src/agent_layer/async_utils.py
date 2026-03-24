@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any, TypeVar
-
-T = TypeVar("T")
+from typing import Any
 
 
 def run_async_in_sync(coro: Any) -> Any:

@@ -11,13 +11,13 @@ tools/call per the MCP specification.
 
 from __future__ import annotations
 
+import json
 import re
 from typing import Any, Awaitable, Callable
 
 from pydantic import BaseModel, Field
 
 from agent_layer.types import RouteMetadata, RouteParameter
-
 
 # ── MCP Types ───────────────────────────────────────────────────────────
 
@@ -259,3 +259,73 @@ async def handle_json_rpc(
         id=request.id,
         error={"code": -32601, "message": f"Method not found: {request.method}"},
     )
+
+
+# ── Shared adapter helpers ─────────────────────────────────────────────
+
+
+def build_tool_route_map(
+    routes: list[RouteMetadata] | None,
+    auto_tools: list[McpToolDefinition],
+) -> dict[str, dict[str, str]]:
+    """Build a mapping from tool names to their original route info."""
+    tool_route_map: dict[str, dict[str, str]] = {}
+    if routes:
+        for i, route in enumerate(routes):
+            if i < len(auto_tools):
+                tool_route_map[auto_tools[i].name] = {
+                    "method": route.method.upper(),
+                    "path": route.path,
+                }
+    return tool_route_map
+
+
+def make_default_tool_call_handler(
+    tool_route_map: dict[str, dict[str, str]],
+) -> ToolCallHandler:
+    """Create the default tool-call handler that returns route dispatch info."""
+
+    async def default_tool_call_handler(
+        tool_name: str, args: dict[str, Any]
+    ) -> dict[str, Any]:
+        route_info = tool_route_map.get(tool_name)
+        if not route_info:
+            parsed = parse_tool_name(tool_name)
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps(
+                            {"error": f"No route handler for tool: {tool_name}", "parsed": parsed}
+                        ),
+                    }
+                ]
+            }
+
+        resolved_path = route_info["path"]
+        query_params: dict[str, str] = {}
+        body_params: dict[str, Any] = {}
+
+        for key, value in args.items():
+            param_pattern = f":{key}"
+            if param_pattern in resolved_path:
+                resolved_path = resolved_path.replace(param_pattern, str(value))
+            elif route_info["method"] in ("GET", "DELETE"):
+                query_params[key] = str(value)
+            else:
+                body_params[key] = value
+
+        qs = "&".join(f"{k}={v}" for k, v in query_params.items())
+        url = f"{resolved_path}?{qs}" if qs else resolved_path
+
+        result: dict[str, Any] = {
+            "tool": tool_name,
+            "method": route_info["method"],
+            "url": url,
+        }
+        if body_params:
+            result["body"] = body_params
+
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
+
+    return default_tool_call_handler

@@ -416,7 +416,7 @@ app.include_router(a2a_routes(A2AConfig(card=A2AAgentCard(
 
 ## Testing
 
-228 tests across 19 test files, covering core logic and all three framework adapters.
+417 tests across 23 test files, covering core logic, all three framework adapters, and E2E integration tests.
 
 ```bash
 pip install -e ".[dev]"

@@ -13,6 +13,8 @@ from agent_layer.flask.a2a import a2a_blueprint
 from agent_layer.flask.mcp import mcp_blueprint
 from agent_layer.flask.unified_discovery import unified_discovery_blueprint
 from agent_layer.flask.ag_ui import ag_ui_stream as flask_ag_ui_stream
+from agent_layer.flask.api_keys import require_api_key as flask_require_api_key
+from agent_layer.flask.oauth2 import oauth2_blueprint
 from agent_layer.flask.app import configure_agent_layer
 
 __all__ = [
@@ -29,5 +31,7 @@ __all__ = [
     "mcp_blueprint",
     "unified_discovery_blueprint",
     "flask_ag_ui_stream",
+    "flask_require_api_key",
+    "oauth2_blueprint",
     "configure_agent_layer",
 ]

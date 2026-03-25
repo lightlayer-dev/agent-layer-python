@@ -11,6 +11,8 @@ from agent_layer.django.auth import agent_auth_urlpatterns
 from agent_layer.django.mcp import mcp_urlpatterns
 from agent_layer.django.unified_discovery import unified_discovery_urlpatterns
 from agent_layer.django.ag_ui import ag_ui_stream as django_ag_ui_stream
+from agent_layer.django.api_keys import require_api_key as django_require_api_key
+from agent_layer.django.oauth2 import oauth2_urlpatterns
 from agent_layer.django.app import configure_agent_layer
 
 __all__ = [
@@ -27,5 +29,7 @@ __all__ = [
     "mcp_urlpatterns",
     "unified_discovery_urlpatterns",
     "django_ag_ui_stream",
+    "django_require_api_key",
+    "oauth2_urlpatterns",
     "configure_agent_layer",
 ]

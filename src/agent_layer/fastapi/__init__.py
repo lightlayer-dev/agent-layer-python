@@ -15,6 +15,8 @@ from agent_layer.fastapi.x402 import x402_middleware
 from agent_layer.fastapi.a2a import a2a_routes
 from agent_layer.fastapi.unified_discovery import unified_discovery_routes
 from agent_layer.fastapi.mcp import mcp_routes
+from agent_layer.fastapi.api_keys import api_key_dependency
+from agent_layer.fastapi.oauth2 import oauth2_routes
 from agent_layer.fastapi.app import configure_agent_layer
 
 __all__ = [
@@ -32,5 +34,7 @@ __all__ = [
     "a2a_routes",
     "unified_discovery_routes",
     "mcp_routes",
+    "api_key_dependency",
+    "oauth2_routes",
     "configure_agent_layer",
 ]

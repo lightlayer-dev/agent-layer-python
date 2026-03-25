@@ -6,7 +6,6 @@ against them to verify scoring accuracy.
 
 from __future__ import annotations
 
-import asyncio
 import threading
 
 import pytest

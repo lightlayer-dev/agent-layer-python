@@ -128,7 +128,6 @@ class TestRateLimiting(TestCase):
 
     def test_rate_limit_429_after_exhaustion(self):
         factory = RequestFactory()
-        middleware = RateLimitsMiddleware(lambda r: JsonResponse({"ok": True}))
         # First two requests should succeed, third should be rate limited
         with override_settings(AGENT_LAYER_RATE_LIMIT={"max": 2}):
             small_middleware = RateLimitsMiddleware(lambda r: JsonResponse({"ok": True}))

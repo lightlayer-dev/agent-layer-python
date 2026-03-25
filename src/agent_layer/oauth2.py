@@ -17,7 +17,7 @@ import json
 import secrets
 from dataclasses import dataclass
 from typing import Any
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode
 
 import httpx
 from pydantic import BaseModel, Field

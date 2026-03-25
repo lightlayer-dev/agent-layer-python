@@ -6,21 +6,17 @@ import base64
 import json
 import time
 
-import pytest
 
 from agent_layer.oauth2 import (
     OAuth2Config,
     OAuth2TokenError,
     PKCEPair,
-    TokenResponse,
     build_authorization_url,
     build_oauth2_metadata,
     compute_code_challenge,
-    exchange_code,
     extract_bearer_token,
     generate_code_verifier,
     generate_pkce,
-    refresh_access_token,
     validate_access_token,
 )
 

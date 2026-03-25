@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 from flask import g, jsonify, request
 
-from agent_layer.api_keys import ApiKeyStore, ScopedApiKey, has_scope, validate_api_key
+from agent_layer.api_keys import ApiKeyStore, has_scope, validate_api_key
 from agent_layer.async_utils import run_async_in_sync
 
 

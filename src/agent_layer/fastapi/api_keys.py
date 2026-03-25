@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Callable
 
-from fastapi import Depends, HTTPException, Request
+from fastapi import HTTPException, Request
 
 from agent_layer.api_keys import ApiKeyStore, ScopedApiKey, has_scope, validate_api_key
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from agent_layer.auth_handler import (
-    RequireAuthResult,
     build_oauth_discovery_document,
     build_www_authenticate,
     check_require_auth,

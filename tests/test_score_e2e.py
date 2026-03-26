@@ -18,9 +18,6 @@ from agent_layer.fastapi.unified_discovery import unified_discovery_routes
 from agent_layer.score.scanner import scan
 from agent_layer.types import (
     AgentLayerConfig,
-    AIManifest,
-    DiscoveryConfig,
-    LlmsTxtConfig,
     RateLimitConfig,
 )
 from agent_layer.unified_discovery import UnifiedDiscoveryConfig
@@ -36,13 +33,8 @@ def _agent_ready_app() -> FastAPI:
     config = AgentLayerConfig(
         errors=True,
         rate_limit=RateLimitConfig(max=10000),
-        llms_txt=LlmsTxtConfig(title="Score Test API", description="For scanner E2E"),
-        discovery=DiscoveryConfig(
-            manifest=AIManifest(
-                name="Score Test API",
-                description="Agent-ready test server",
-            )
-        ),
+        # llms_txt and discovery handled by unified_discovery_routes below
+        # to avoid duplicate FastAPI operation IDs
     )
     configure_agent_layer(app, config)
 

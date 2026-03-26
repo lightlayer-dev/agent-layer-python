@@ -12,6 +12,8 @@ from agent_layer.flask.discovery import discovery_blueprint
 from agent_layer.flask.auth import agent_auth_blueprint
 from agent_layer.flask.meta import agent_meta_middleware
 from agent_layer.flask.a2a import a2a_blueprint
+from agent_layer.flask.robots_txt import robots_txt_routes
+from agent_layer.flask.security_headers import security_headers_middleware
 
 
 def configure_agent_layer(app: Flask, config: AgentLayerConfig) -> Flask:
@@ -55,5 +57,11 @@ def configure_agent_layer(app: Flask, config: AgentLayerConfig) -> Flask:
         from agent_layer.flask.analytics import agent_analytics_middleware
 
         agent_analytics_middleware(app, _AC(**config.analytics.model_dump()))
+
+    if config.security_headers:
+        security_headers_middleware(app, config.security_headers)
+
+    if config.robots_txt:
+        app.register_blueprint(robots_txt_routes(config.robots_txt))
 
     return app

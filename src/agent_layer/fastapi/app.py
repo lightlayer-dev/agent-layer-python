@@ -13,6 +13,8 @@ from agent_layer.fastapi.auth import agent_auth_routes
 from agent_layer.fastapi.analytics import agent_analytics_middleware
 from agent_layer.fastapi.meta import agent_meta_middleware
 from agent_layer.fastapi.a2a import a2a_routes
+from agent_layer.fastapi.robots_txt import robots_txt_routes
+from agent_layer.fastapi.security_headers import security_headers_middleware
 
 
 def configure_agent_layer(app: FastAPI, config: AgentLayerConfig) -> FastAPI:
@@ -59,5 +61,13 @@ def configure_agent_layer(app: FastAPI, config: AgentLayerConfig) -> FastAPI:
         from agent_layer.analytics import AnalyticsConfig as _AC
 
         agent_analytics_middleware(app, _AC(**config.analytics.model_dump()))
+
+    # Security headers (on every response)
+    if config.security_headers:
+        security_headers_middleware(app, config.security_headers)
+
+    # robots.txt route
+    if config.robots_txt:
+        app.include_router(robots_txt_routes(config.robots_txt))
 
     return app

@@ -17,6 +17,8 @@ from agent_layer.fastapi.unified_discovery import unified_discovery_routes
 from agent_layer.fastapi.mcp import mcp_routes
 from agent_layer.fastapi.api_keys import api_key_dependency
 from agent_layer.fastapi.oauth2 import oauth2_routes
+from agent_layer.fastapi.robots_txt import robots_txt_routes
+from agent_layer.fastapi.security_headers import security_headers_middleware
 from agent_layer.fastapi.app import configure_agent_layer
 
 __all__ = [
@@ -36,5 +38,7 @@ __all__ = [
     "mcp_routes",
     "api_key_dependency",
     "oauth2_routes",
+    "robots_txt_routes",
+    "security_headers_middleware",
     "configure_agent_layer",
 ]

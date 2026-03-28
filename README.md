@@ -431,7 +431,8 @@ CI runs on Python 3.11, 3.12, and 3.13.
 
 | Project | Description |
 |---------|-------------|
-| [**agent-layer-ts**](https://github.com/lightlayer-dev/agent-layer-ts) | TypeScript version (Express / Koa / Hono) |
+| [**LightLayer Gateway**](https://github.com/lightlayer-dev/gateway) | Standalone reverse proxy — same features, zero code changes |
+| [**agent-layer-ts**](https://github.com/lightlayer-dev/agent-layer-ts) | TypeScript version (Express / Koa / Hono / Fastify) |
 | [**agent-bench**](https://github.com/lightlayer-dev/agent-bench) | Benchmark your site's agent-readiness score |
 | [**LightLayer Dashboard**](https://github.com/lightlayer-dev/lightlayer-dashboard) | Analytics & monitoring UI |
 

@@ -17,6 +17,7 @@ from agent_layer.flask.api_keys import require_api_key as flask_require_api_key
 from agent_layer.flask.oauth2 import oauth2_blueprint
 from agent_layer.flask.robots_txt import robots_txt_routes
 from agent_layer.flask.security_headers import security_headers_middleware as flask_security_headers_middleware
+from agent_layer.flask.agent_onboarding import agent_onboarding_blueprint, agent_onboarding_auth_middleware
 from agent_layer.flask.app import configure_agent_layer
 
 __all__ = [
@@ -37,5 +38,7 @@ __all__ = [
     "oauth2_blueprint",
     "robots_txt_routes",
     "flask_security_headers_middleware",
+    "agent_onboarding_blueprint",
+    "agent_onboarding_auth_middleware",
     "configure_agent_layer",
 ]

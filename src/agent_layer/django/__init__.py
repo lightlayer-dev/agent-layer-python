@@ -17,6 +17,7 @@ from agent_layer.django.api_keys import require_api_key as django_require_api_ke
 from agent_layer.django.oauth2 import oauth2_urlpatterns
 from agent_layer.django.robots_txt import robots_txt_urlpatterns
 from agent_layer.django.security_headers import SecurityHeadersMiddleware, security_headers_middleware_class
+from agent_layer.django.agent_onboarding import agent_onboarding_urlpatterns, AgentOnboardingAuthMiddleware
 from agent_layer.django.app import configure_agent_layer
 
 __all__ = [
@@ -38,5 +39,7 @@ __all__ = [
     "robots_txt_urlpatterns",
     "SecurityHeadersMiddleware",
     "security_headers_middleware_class",
+    "agent_onboarding_urlpatterns",
+    "AgentOnboardingAuthMiddleware",
     "configure_agent_layer",
 ]

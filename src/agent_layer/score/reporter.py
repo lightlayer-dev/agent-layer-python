@@ -58,7 +58,31 @@ def format_report(report: ScoreReport) -> str:
 def badge_url(score: int, label: str = "Agent-Ready") -> str:
     """Generate a shields.io badge URL for the score."""
     color = "brightgreen" if score >= 80 else ("yellow" if score >= 50 else "red")
-    return f"https://img.shields.io/badge/{quote(label)}-{score}%2F100-{color}"
+    logo = (
+        "data:image/svg+xml;base64,"
+        "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9"
+        "IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAy"
+        "IDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAx"
+        "MiAyem0wIDE4Yy00LjQyIDAtOC0zLjU4LTgtOHMzLjU4LTggOC04IDggMy41OCA4"
+        "IDgtMy41OCA0LTggOHoiLz48L3N2Zz4="
+    )
+    return (
+        f"https://img.shields.io/badge/{quote(label)}-{score}%2F100-{color}"
+        f"?logo={logo}"
+        f"&link=https://github.com/lightlayer-dev/agent-layer-ts"
+    )
+
+
+def badge_markdown(score: int, label: str = "Agent-Ready") -> str:
+    """Generate the full markdown badge with link for READMEs.
+
+    Links back to the agent-layer repo for brand attribution.
+    """
+    url = badge_url(score, label)
+    return (
+        f'[![{label}: {score}/100]({url})]'
+        f'(https://github.com/lightlayer-dev/agent-layer-ts "Scored by @agent-layer/score")'
+    )
 
 
 def format_json(report: ScoreReport) -> str:

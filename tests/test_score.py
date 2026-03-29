@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 from agent_layer.score.types import CheckResult, ScanConfig, ScoreReport
 from agent_layer.score.scanner import scan
-from agent_layer.score.reporter import format_report, format_json, badge_url
+from agent_layer.score.reporter import format_report, format_json, badge_url, badge_markdown
 from agent_layer.score.checks.utils import resolve_url
 
 
@@ -77,6 +77,26 @@ def test_badge_url():
     assert "red" in badge_url(30)
     assert "Agent-Ready" in badge_url(80)
     assert "Custom" in badge_url(80, "Custom")
+    # Logo SVG should be present (TS parity)
+    assert "logo=" in badge_url(80)
+    assert "link=" in badge_url(80)
+
+
+def test_badge_markdown():
+    md = badge_markdown(85)
+    assert "[![Agent-Ready: 85/100]" in md
+    assert "brightgreen" in md
+    assert "https://github.com/lightlayer-dev/agent-layer-ts" in md
+    assert 'Scored by @agent-layer/score' in md
+
+    # Custom label
+    md2 = badge_markdown(40, "My Score")
+    assert "[![My Score: 40/100]" in md2
+    assert "red" in md2
+
+    # Yellow range
+    md3 = badge_markdown(65)
+    assert "yellow" in md3
 
 
 # -- Scanner --

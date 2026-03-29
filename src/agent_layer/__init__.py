@@ -118,6 +118,20 @@ from agent_layer.auth_handler import (
     build_www_authenticate,
     check_require_auth,
 )
+from agent_layer.agent_onboarding import (
+    OnboardingConfig,
+    OnboardingHandler,
+    RegistrationRequest,
+    RegistrationResponse,
+    Credential,
+    WebhookRequest,
+    AuthRequiredResponse,
+    HandlerResult as OnboardingResult,
+    SUPPORTED_CREDENTIAL_TYPES,
+    create_onboarding_handler,
+    sign_webhook_payload,
+    verify_webhook_signature,
+)
 
 __all__ = [
     "AgentError",
@@ -223,4 +237,16 @@ __all__ = [
     "build_oauth_discovery_document",
     "build_www_authenticate",
     "check_require_auth",
+    "OnboardingConfig",
+    "OnboardingHandler",
+    "OnboardingResult",
+    "RegistrationRequest",
+    "RegistrationResponse",
+    "Credential",
+    "WebhookRequest",
+    "AuthRequiredResponse",
+    "SUPPORTED_CREDENTIAL_TYPES",
+    "create_onboarding_handler",
+    "sign_webhook_payload",
+    "verify_webhook_signature",
 ]

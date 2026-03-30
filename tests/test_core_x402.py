@@ -55,8 +55,11 @@ class TestProcessX402Request:
     async def test_pass_through(self):
         config = _make_config()
         result = await process_x402_request(
-            method="GET", path="/api/other", url="http://example.com/api/other",
-            payment_header=None, config=config,
+            method="GET",
+            path="/api/other",
+            url="http://example.com/api/other",
+            payment_header=None,
+            config=config,
         )
         assert result.action == "pass_through"
 
@@ -64,8 +67,11 @@ class TestProcessX402Request:
     async def test_payment_required(self):
         config = _make_config()
         result = await process_x402_request(
-            method="GET", path="/api/weather", url="http://example.com/api/weather",
-            payment_header=None, config=config,
+            method="GET",
+            path="/api/weather",
+            url="http://example.com/api/weather",
+            payment_header=None,
+            config=config,
         )
         assert result.action == "payment_required"
         assert result.status_code == 402
@@ -76,8 +82,11 @@ class TestProcessX402Request:
     async def test_invalid_payment_header(self):
         config = _make_config()
         result = await process_x402_request(
-            method="GET", path="/api/weather", url="http://example.com/api/weather",
-            payment_header="invalid-base64!!!", config=config,
+            method="GET",
+            path="/api/weather",
+            url="http://example.com/api/weather",
+            payment_header="invalid-base64!!!",
+            config=config,
         )
         assert result.action == "payment_required"
         assert result.status_code == 402
@@ -95,8 +104,12 @@ class TestProcessX402Request:
         )
 
         result = await process_x402_request(
-            method="GET", path="/api/weather", url="http://example.com/api/weather",
-            payment_header=payment_header, config=config, facilitator=facilitator,
+            method="GET",
+            path="/api/weather",
+            url="http://example.com/api/weather",
+            payment_header=payment_header,
+            config=config,
+            facilitator=facilitator,
         )
         assert result.action == "success"
         assert result.settlement_b64 is not None
@@ -114,8 +127,12 @@ class TestProcessX402Request:
         )
 
         result = await process_x402_request(
-            method="GET", path="/api/weather", url="http://example.com/api/weather",
-            payment_header=payment_header, config=config, facilitator=facilitator,
+            method="GET",
+            path="/api/weather",
+            url="http://example.com/api/weather",
+            payment_header=payment_header,
+            config=config,
+            facilitator=facilitator,
         )
         assert result.action == "payment_required"
         assert result.status_code == 402
@@ -130,8 +147,12 @@ class TestProcessX402Request:
         facilitator.verify.side_effect = Exception("Network error")
 
         result = await process_x402_request(
-            method="GET", path="/api/weather", url="http://example.com/api/weather",
-            payment_header=payment_header, config=config, facilitator=facilitator,
+            method="GET",
+            path="/api/weather",
+            url="http://example.com/api/weather",
+            payment_header=payment_header,
+            config=config,
+            facilitator=facilitator,
         )
         assert result.action == "error"
         assert result.status_code == 502
@@ -149,8 +170,12 @@ class TestProcessX402Request:
         )
 
         result = await process_x402_request(
-            method="GET", path="/api/weather", url="http://example.com/api/weather",
-            payment_header=payment_header, config=config, facilitator=facilitator,
+            method="GET",
+            path="/api/weather",
+            url="http://example.com/api/weather",
+            payment_header=payment_header,
+            config=config,
+            facilitator=facilitator,
         )
         assert result.action == "payment_required"
         assert result.status_code == 402

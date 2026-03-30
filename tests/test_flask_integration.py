@@ -68,9 +68,11 @@ class TestRateLimiting:
 
 class TestLlmsTxt:
     def test_llms_txt_route(self):
-        app = _create_app(AgentLayerConfig(
-            llms_txt=LlmsTxtConfig(title="Test API", description="For testing"),
-        ))
+        app = _create_app(
+            AgentLayerConfig(
+                llms_txt=LlmsTxtConfig(title="Test API", description="For testing"),
+            )
+        )
         client = app.test_client()
         resp = client.get("/llms.txt")
         assert resp.status_code == 200
@@ -79,18 +81,22 @@ class TestLlmsTxt:
 
 class TestDiscovery:
     def test_well_known_ai(self):
-        app = _create_app(AgentLayerConfig(
-            discovery=DiscoveryConfig(manifest=AIManifest(name="Test API")),
-        ))
+        app = _create_app(
+            AgentLayerConfig(
+                discovery=DiscoveryConfig(manifest=AIManifest(name="Test API")),
+            )
+        )
         client = app.test_client()
         resp = client.get("/.well-known/ai")
         assert resp.status_code == 200
         assert resp.get_json()["name"] == "Test API"
 
     def test_json_ld(self):
-        app = _create_app(AgentLayerConfig(
-            discovery=DiscoveryConfig(manifest=AIManifest(name="Test API")),
-        ))
+        app = _create_app(
+            AgentLayerConfig(
+                discovery=DiscoveryConfig(manifest=AIManifest(name="Test API")),
+            )
+        )
         client = app.test_client()
         resp = client.get("/json-ld")
         assert resp.status_code == 200
@@ -99,11 +105,13 @@ class TestDiscovery:
 
 class TestFullConfig:
     def test_all_features(self):
-        app = _create_app(AgentLayerConfig(
-            rate_limit=RateLimitConfig(max=100),
-            llms_txt=LlmsTxtConfig(title="Full API"),
-            discovery=DiscoveryConfig(manifest=AIManifest(name="Full API")),
-        ))
+        app = _create_app(
+            AgentLayerConfig(
+                rate_limit=RateLimitConfig(max=100),
+                llms_txt=LlmsTxtConfig(title="Full API"),
+                discovery=DiscoveryConfig(manifest=AIManifest(name="Full API")),
+            )
+        )
         client = app.test_client()
 
         assert client.get("/ok").status_code == 200

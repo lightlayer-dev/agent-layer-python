@@ -142,6 +142,7 @@ class TestGenerateUnifiedLlmsTxt:
 
     def test_extra_sections(self, base_config):
         from agent_layer.types import LlmsTxtSection
+
         base_config.llms_txt_sections = [
             LlmsTxtSection(title="Auth", content="Use OAuth2 bearer tokens.")
         ]

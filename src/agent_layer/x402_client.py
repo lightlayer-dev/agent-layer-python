@@ -97,9 +97,7 @@ async def wrap_request_with_payment(
     # Sign payment for the first accepted payment scheme
     accepted = requirements.accepts[0]
     payload = await wallet_signer.sign(accepted)
-    encoded = base64.b64encode(
-        json.dumps(payload.model_dump(by_alias=True)).encode()
-    ).decode()
+    encoded = base64.b64encode(json.dumps(payload.model_dump(by_alias=True)).encode()).decode()
 
     # Retry with payment header
     retry_headers = {**req_headers, HEADER_PAYMENT_SIGNATURE: encoded}

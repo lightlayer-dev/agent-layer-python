@@ -48,13 +48,15 @@ def agent_onboarding_urlpatterns(config: OnboardingConfig) -> list:
 
 # ── Exempt paths ─────────────────────────────────────────────────────────
 
-_EXEMPT_PATHS = frozenset({
-    "/agent/register",
-    "/llms.txt",
-    "/llms-full.txt",
-    "/agents.txt",
-    "/robots.txt",
-})
+_EXEMPT_PATHS = frozenset(
+    {
+        "/agent/register",
+        "/llms.txt",
+        "/llms-full.txt",
+        "/agents.txt",
+        "/robots.txt",
+    }
+)
 
 
 class AgentOnboardingAuthMiddleware:

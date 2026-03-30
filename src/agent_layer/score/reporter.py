@@ -80,7 +80,7 @@ def badge_markdown(score: int, label: str = "Agent-Ready") -> str:
     """
     url = badge_url(score, label)
     return (
-        f'[![{label}: {score}/100]({url})]'
+        f"[![{label}: {score}/100]({url})]"
         f'(https://github.com/lightlayer-dev/agent-layer-ts "Scored by @agent-layer/score")'
     )
 

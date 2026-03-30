@@ -25,10 +25,12 @@ class TestGenerateJsonLd:
         assert ld["name"] == "X"
 
     def test_with_contact(self):
-        config = DiscoveryConfig(manifest=AIManifest(
-            name="X",
-            contact=AIManifestContact(email="a@b.com", url="https://x.com"),
-        ))
+        config = DiscoveryConfig(
+            manifest=AIManifest(
+                name="X",
+                contact=AIManifestContact(email="a@b.com", url="https://x.com"),
+            )
+        )
         ld = generate_json_ld(config)
         assert ld["url"] == "https://x.com"
         assert ld["contactPoint"]["email"] == "a@b.com"

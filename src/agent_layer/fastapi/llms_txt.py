@@ -21,6 +21,7 @@ def llms_txt_routes(
         return generate_llms_txt(config)
 
     if routes is not None:
+
         @router.get("/llms-full.txt", response_class=PlainTextResponse)
         async def llms_full_txt():
             return generate_llms_full_txt(config, routes)

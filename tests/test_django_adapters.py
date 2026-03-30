@@ -188,13 +188,15 @@ class TestDjangoAgentIdentity(TestCase):
         from agent_layer.django.agent_identity import AgentIdentityMiddleware
 
         now = int(time.time())
-        token = _make_jwt({
-            "iss": "https://auth.example.com",
-            "sub": "agent-1",
-            "aud": "https://api.example.com",
-            "exp": now + 3600,
-            "iat": now,
-        })
+        token = _make_jwt(
+            {
+                "iss": "https://auth.example.com",
+                "sub": "agent-1",
+                "aud": "https://api.example.com",
+                "exp": now + 3600,
+                "iat": now,
+            }
+        )
 
         middleware = AgentIdentityMiddleware(lambda r: JsonResponse({"ok": True}))
         factory = RequestFactory()

@@ -17,9 +17,7 @@ from agent_layer.agents_txt import (
 
 
 def test_generate_minimal():
-    config = AgentsTxtConfig(
-        rules=[AgentsTxtRule(agent="*", allow=["/api/*"])]
-    )
+    config = AgentsTxtConfig(rules=[AgentsTxtRule(agent="*", allow=["/api/*"])])
     txt = generate_agents_txt(config)
     assert "User-agent: *" in txt
     assert "Allow: /api/*" in txt
@@ -144,17 +142,13 @@ def test_parse_empty():
 
 
 def test_allowed_wildcard():
-    config = AgentsTxtConfig(
-        rules=[AgentsTxtRule(agent="*", allow=["/api/*"])]
-    )
+    config = AgentsTxtConfig(rules=[AgentsTxtRule(agent="*", allow=["/api/*"])])
     assert is_agent_allowed(config, "SomeBot", "/api/data") is True
     assert is_agent_allowed(config, "SomeBot", "/admin") is False
 
 
 def test_denied_path():
-    config = AgentsTxtConfig(
-        rules=[AgentsTxtRule(agent="*", allow=["/*"], deny=["/admin/*"])]
-    )
+    config = AgentsTxtConfig(rules=[AgentsTxtRule(agent="*", allow=["/*"], deny=["/admin/*"])])
     assert is_agent_allowed(config, "Bot", "/api/data") is True
     assert is_agent_allowed(config, "Bot", "/admin/users") is False
 
@@ -183,16 +177,12 @@ def test_pattern_agent_match():
 
 
 def test_no_matching_rule():
-    config = AgentsTxtConfig(
-        rules=[AgentsTxtRule(agent="SpecificBot", allow=["/*"])]
-    )
+    config = AgentsTxtConfig(rules=[AgentsTxtRule(agent="SpecificBot", allow=["/*"])])
     assert is_agent_allowed(config, "OtherBot", "/api") is None
 
 
 def test_no_allow_deny_implicit_allow():
-    config = AgentsTxtConfig(
-        rules=[AgentsTxtRule(agent="*")]
-    )
+    config = AgentsTxtConfig(rules=[AgentsTxtRule(agent="*")])
     assert is_agent_allowed(config, "AnyBot", "/anything") is True
 
 

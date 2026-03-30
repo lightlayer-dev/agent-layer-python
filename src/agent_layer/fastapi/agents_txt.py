@@ -32,9 +32,7 @@ class AgentsTxtEnforceMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.config = config
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         if not self.config.enforce:
             return await call_next(request)
 

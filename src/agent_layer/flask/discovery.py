@@ -21,6 +21,7 @@ def discovery_blueprint(config: DiscoveryConfig) -> Blueprint:
         return jsonify(generate_json_ld(config))
 
     if config.openapi_spec:
+
         @bp.route("/openapi.json")
         def openapi_spec():
             return jsonify(config.openapi_spec)

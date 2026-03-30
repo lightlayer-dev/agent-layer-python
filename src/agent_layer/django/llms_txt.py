@@ -21,6 +21,7 @@ def llms_txt_urlpatterns(
     patterns = [path("llms.txt", llms_txt_view, name="llms_txt")]
 
     if routes is not None:
+
         def llms_full_txt_view(request):
             return HttpResponse(generate_llms_full_txt(config, routes), content_type="text/plain")
 

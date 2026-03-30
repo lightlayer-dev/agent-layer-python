@@ -23,7 +23,9 @@ def _type_for_status(status: int) -> str:
 def format_error(opts: AgentErrorOptions) -> AgentErrorEnvelope:
     """Format an error into the standard agent-friendly envelope."""
     status = opts.status
-    is_retriable = opts.is_retriable if opts.is_retriable is not None else (status == 429 or status >= 500)
+    is_retriable = (
+        opts.is_retriable if opts.is_retriable is not None else (status == 429 or status >= 500)
+    )
 
     return AgentErrorEnvelope(
         type=opts.type or _type_for_status(status),

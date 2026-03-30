@@ -28,7 +28,12 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.requests import Request
 from starlette.responses import Response
 
-from agent_layer.analytics import AnalyticsConfig, AnalyticsInstance, build_agent_event, create_analytics
+from agent_layer.analytics import (
+    AnalyticsConfig,
+    AnalyticsInstance,
+    build_agent_event,
+    create_analytics,
+)
 
 
 def agent_analytics_middleware(

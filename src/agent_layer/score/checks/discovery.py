@@ -44,7 +44,9 @@ async def check_discovery(config: ScanConfig) -> CheckResult:
         base.score = 7
         base.severity = "warn"
         base.message = f"Found: {found[0]}. Consider adding more discovery formats."
-        base.suggestion = "Use agent-layer unified-discovery middleware to serve all formats from a single config"
+        base.suggestion = (
+            "Use agent-layer unified-discovery middleware to serve all formats from a single config"
+        )
     else:
         base.message = "No agent discovery endpoints found"
         base.suggestion = "Add /.well-known/agent-card.json (A2A) and /.well-known/agent.json — agent-layer makes this one line of config"

@@ -52,8 +52,12 @@ async def check_structured_errors(config: ScanConfig) -> CheckResult:
     elif ratio > 0:
         base.score = 5
         base.severity = "warn"
-        base.message = f"{json_errors}/{total_responses} error responses return JSON (some return HTML)"
-        base.suggestion = "Use agent-layer error middleware to ensure all errors return structured JSON"
+        base.message = (
+            f"{json_errors}/{total_responses} error responses return JSON (some return HTML)"
+        )
+        base.suggestion = (
+            "Use agent-layer error middleware to ensure all errors return structured JSON"
+        )
     else:
         base.message = "Error responses return HTML instead of structured JSON"
         base.suggestion = "Use agent-layer error middleware to wrap errors in agent-friendly JSON"

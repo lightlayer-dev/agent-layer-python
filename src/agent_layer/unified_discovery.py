@@ -146,9 +146,7 @@ def generate_unified_ai_manifest(config: UnifiedDiscoveryConfig) -> dict[str, An
             scopes=config.auth.scopes,
         )
 
-    llms_txt_url = (
-        f"{config.url}/llms.txt" if config.formats.llms_txt else None
-    )
+    llms_txt_url = f"{config.url}/llms.txt" if config.formats.llms_txt else None
 
     manifest = AIManifest(
         name=config.name,
@@ -217,8 +215,7 @@ def generate_unified_llms_txt(config: UnifiedDiscoveryConfig) -> str:
                     [
                         s.description or "",
                         (
-                            "\nExamples:\n"
-                            + "\n".join(f"- {e}" for e in s.examples)
+                            "\nExamples:\n" + "\n".join(f"- {e}" for e in s.examples)
                             if s.examples
                             else ""
                         ),
@@ -249,8 +246,7 @@ def generate_unified_llms_full_txt(config: UnifiedDiscoveryConfig) -> str:
                     [
                         s.description or "",
                         (
-                            "\nExamples:\n"
-                            + "\n".join(f"- {e}" for e in s.examples)
+                            "\nExamples:\n" + "\n".join(f"- {e}" for e in s.examples)
                             if s.examples
                             else ""
                         ),

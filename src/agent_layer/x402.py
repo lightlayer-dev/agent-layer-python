@@ -251,9 +251,7 @@ def match_route(
 
 def encode_settlement(settle_result: SettleResponse) -> str:
     """Encode a SettleResponse to a base64 string for the response header."""
-    return base64.b64encode(
-        json.dumps(settle_result.model_dump(by_alias=True)).encode()
-    ).decode()
+    return base64.b64encode(json.dumps(settle_result.model_dump(by_alias=True)).encode()).decode()
 
 
 # ── Core Payment Flow ─────────────────────────────────────────────────

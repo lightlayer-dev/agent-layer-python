@@ -92,9 +92,7 @@ def mcp_urlpatterns(
             def event_stream():
                 yield f": session {session_id}\n\n"
 
-            response = StreamingHttpResponse(
-                event_stream(), content_type="text/event-stream"
-            )
+            response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
             response["Cache-Control"] = "no-cache"
             response["Connection"] = "keep-alive"
             response["Mcp-Session-Id"] = session_id

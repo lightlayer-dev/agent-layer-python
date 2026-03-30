@@ -167,8 +167,18 @@ def decode_jwt_claims(token: str) -> dict[str, Any] | None:
 # ── Claims Extraction ────────────────────────────────────────────────────
 
 _KNOWN_CLAIMS = {
-    "iss", "sub", "aud", "exp", "iat", "nbf", "jti",
-    "scope", "scopes", "scp", "act", "agent_id",
+    "iss",
+    "sub",
+    "aud",
+    "exp",
+    "iat",
+    "nbf",
+    "jti",
+    "scope",
+    "scopes",
+    "scp",
+    "act",
+    "agent_id",
 }
 
 

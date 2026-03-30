@@ -62,8 +62,6 @@ def test_no_ai_agents() -> None:
 
 def test_crawl_delay() -> None:
     """crawl_delay is included when set."""
-    config = RobotsTxtConfig(
-        rules=[RobotsTxtRule(user_agent="*", allow=["/"], crawl_delay=10)]
-    )
+    config = RobotsTxtConfig(rules=[RobotsTxtRule(user_agent="*", allow=["/"], crawl_delay=10)])
     result = generate_robots_txt(config)
     assert "Crawl-delay: 10" in result

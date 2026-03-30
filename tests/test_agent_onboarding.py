@@ -95,9 +95,7 @@ class TestHandleRegister:
 
     @pytest.mark.asyncio
     async def test_sends_webhook_signature(self) -> None:
-        handler = create_onboarding_handler(
-            make_config(webhook_secret="test-secret")
-        )
+        handler = create_onboarding_handler(make_config(webhook_secret="test-secret"))
         mock_post = _mock_httpx_post(PROVISIONED_RESPONSE)
 
         with patch("agent_layer.agent_onboarding.httpx.AsyncClient") as mock_client_cls:
@@ -132,9 +130,7 @@ class TestHandleRegister:
     @pytest.mark.asyncio
     async def test_rejects_missing_agent_provider(self) -> None:
         handler = create_onboarding_handler(make_config())
-        result = await handler.handle_register(
-            make_request(agent_provider=""), "1.2.3.4"
-        )
+        result = await handler.handle_register(make_request(agent_provider=""), "1.2.3.4")
         assert result.status == 400
         assert result.body["code"] == "missing_field"
 
@@ -157,9 +153,7 @@ class TestHandleRegister:
             mock_client.__aexit__ = AsyncMock(return_value=False)
             mock_client_cls.return_value = mock_client
 
-            result = await handler.handle_register(
-                make_request(identity_token="eyJ..."), "1.2.3.4"
-            )
+            result = await handler.handle_register(make_request(identity_token="eyJ..."), "1.2.3.4")
 
         assert result.status == 200
         call_kwargs = mock_post.call_args
@@ -168,18 +162,14 @@ class TestHandleRegister:
 
     @pytest.mark.asyncio
     async def test_rejects_disallowed_provider(self) -> None:
-        handler = create_onboarding_handler(
-            make_config(allowed_providers=["anthropic", "google"])
-        )
+        handler = create_onboarding_handler(make_config(allowed_providers=["anthropic", "google"]))
         result = await handler.handle_register(make_request(), "1.2.3.4")
         assert result.status == 403
         assert result.body["code"] == "provider_not_allowed"
 
     @pytest.mark.asyncio
     async def test_allows_provider_case_insensitive(self) -> None:
-        handler = create_onboarding_handler(
-            make_config(allowed_providers=["OpenAI"])
-        )
+        handler = create_onboarding_handler(make_config(allowed_providers=["OpenAI"]))
         mock_post = _mock_httpx_post(PROVISIONED_RESPONSE)
 
         with patch("agent_layer.agent_onboarding.httpx.AsyncClient") as mock_client_cls:
@@ -296,22 +286,14 @@ class TestShouldReturn401:
 
     def test_false_with_authorization_header(self) -> None:
         assert (
-            self.handler.should_return_401(
-                "/api/data", {"authorization": "Bearer token"}
-            )
-            is False
+            self.handler.should_return_401("/api/data", {"authorization": "Bearer token"}) is False
         )
 
     def test_false_with_api_key_header(self) -> None:
-        assert (
-            self.handler.should_return_401("/api/data", {"x-api-key": "key123"})
-            is False
-        )
+        assert self.handler.should_return_401("/api/data", {"x-api-key": "key123"}) is False
 
     def test_false_for_well_known(self) -> None:
-        assert (
-            self.handler.should_return_401("/.well-known/agent.json", {}) is False
-        )
+        assert self.handler.should_return_401("/.well-known/agent.json", {}) is False
 
     def test_false_for_llms_txt(self) -> None:
         assert self.handler.should_return_401("/llms.txt", {}) is False
@@ -331,9 +313,7 @@ class TestShouldReturn401:
 
 class TestGetAuthRequiredResponse:
     def test_returns_standard_response(self) -> None:
-        handler = create_onboarding_handler(
-            make_config(auth_docs="https://docs.example.com/auth")
-        )
+        handler = create_onboarding_handler(make_config(auth_docs="https://docs.example.com/auth"))
         resp = handler.get_auth_required_response()
 
         assert resp["error"] == "auth_required"

@@ -47,7 +47,9 @@ async def test_cache_control(app: FastAPI) -> None:
 
 @pytest.mark.asyncio
 async def test_custom_config(custom_app: FastAPI) -> None:
-    async with AsyncClient(transport=ASGITransport(app=custom_app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=custom_app), base_url="http://test"
+    ) as client:
         resp = await client.get("/robots.txt")
     assert resp.status_code == 200
     assert "Disallow: /" in resp.text

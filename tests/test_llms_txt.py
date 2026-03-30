@@ -14,10 +14,12 @@ class TestGenerateLlmsTxt:
         assert "> A cool API" in txt
 
     def test_with_sections(self):
-        txt = generate_llms_txt(LlmsTxtConfig(
-            title="X",
-            sections=[LlmsTxtSection(title="Auth", content="Use Bearer tokens.")],
-        ))
+        txt = generate_llms_txt(
+            LlmsTxtConfig(
+                title="X",
+                sections=[LlmsTxtSection(title="Auth", content="Use Bearer tokens.")],
+            )
+        )
         assert "## Auth" in txt
         assert "Use Bearer tokens." in txt
 
@@ -34,10 +36,17 @@ class TestGenerateLlmsFullTxt:
     def test_route_parameters(self):
         txt = generate_llms_full_txt(
             LlmsTxtConfig(title="API"),
-            routes=[RouteMetadata(
-                method="POST", path="/users",
-                parameters=[RouteParameter(name="name", location="body", required=True, description="User name")],
-            )],
+            routes=[
+                RouteMetadata(
+                    method="POST",
+                    path="/users",
+                    parameters=[
+                        RouteParameter(
+                            name="name", location="body", required=True, description="User name"
+                        )
+                    ],
+                )
+            ],
         )
         assert "`name` (body)" in txt
         assert "(required)" in txt

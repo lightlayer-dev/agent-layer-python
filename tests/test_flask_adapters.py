@@ -189,16 +189,19 @@ class TestFlaskAgentIdentity:
         @app.route("/protected")
         def protected():
             from flask import g
+
             return {"agent": g.agent_identity.agent_id}
 
         now = int(time.time())
-        token = _make_jwt({
-            "iss": "https://auth.example.com",
-            "sub": "agent-1",
-            "aud": "https://api.example.com",
-            "exp": now + 3600,
-            "iat": now,
-        })
+        token = _make_jwt(
+            {
+                "iss": "https://auth.example.com",
+                "sub": "agent-1",
+                "aud": "https://api.example.com",
+                "exp": now + 3600,
+                "iat": now,
+            }
+        )
 
         with app.test_client() as client:
             resp = client.get("/protected", headers={"Authorization": f"Bearer {token}"})

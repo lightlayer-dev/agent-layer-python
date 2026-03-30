@@ -177,9 +177,7 @@ class TestFastAPIAnalytics:
 
         events: list[AgentEvent] = []
         app = FastAPI()
-        agent_analytics_middleware(
-            app, AnalyticsConfig(on_event=events.append, track_all=True)
-        )
+        agent_analytics_middleware(app, AnalyticsConfig(on_event=events.append, track_all=True))
 
         @app.get("/hello")
         def hello() -> dict[str, str]:

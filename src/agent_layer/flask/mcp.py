@@ -75,9 +75,7 @@ def mcp_blueprint(
                 400,
             )
 
-        result = run_async_in_sync(
-            handle_json_rpc(rpc_request, server_info, all_tools, handler)
-        )
+        result = run_async_in_sync(handle_json_rpc(rpc_request, server_info, all_tools, handler))
 
         if result is None:
             return "", 202

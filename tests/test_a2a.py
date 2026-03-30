@@ -108,16 +108,20 @@ class TestGenerateAgentCard:
 
 class TestValidateAgentCard:
     def test_valid_card(self):
-        errors = validate_agent_card({
-            "name": "test",
-            "url": "https://example.com",
-            "protocolVersion": "1.0.0",
-            "skills": [{"id": "x", "name": "X"}],
-        })
+        errors = validate_agent_card(
+            {
+                "name": "test",
+                "url": "https://example.com",
+                "protocolVersion": "1.0.0",
+                "skills": [{"id": "x", "name": "X"}],
+            }
+        )
         assert errors == []
 
     def test_missing_name(self):
-        errors = validate_agent_card({"url": "https://x.com", "protocolVersion": "1.0.0", "skills": []})
+        errors = validate_agent_card(
+            {"url": "https://x.com", "protocolVersion": "1.0.0", "skills": []}
+        )
         assert "name is required" in errors
 
     def test_missing_url(self):
@@ -125,19 +129,25 @@ class TestValidateAgentCard:
         assert "url is required" in errors
 
     def test_invalid_url(self):
-        errors = validate_agent_card({
-            "name": "x", "url": "ftp://bad", "protocolVersion": "1.0.0", "skills": []
-        })
+        errors = validate_agent_card(
+            {"name": "x", "url": "ftp://bad", "protocolVersion": "1.0.0", "skills": []}
+        )
         assert "url must be an HTTP(S) URL" in errors
 
     def test_missing_skills(self):
-        errors = validate_agent_card({"name": "x", "url": "https://x.com", "protocolVersion": "1.0.0"})
+        errors = validate_agent_card(
+            {"name": "x", "url": "https://x.com", "protocolVersion": "1.0.0"}
+        )
         assert "skills is required" in errors
 
     def test_skill_missing_id(self):
-        errors = validate_agent_card({
-            "name": "x", "url": "https://x.com", "protocolVersion": "1.0.0",
-            "skills": [{"id": "", "name": ""}],
-        })
+        errors = validate_agent_card(
+            {
+                "name": "x",
+                "url": "https://x.com",
+                "protocolVersion": "1.0.0",
+                "skills": [{"id": "", "name": ""}],
+            }
+        )
         assert "each skill must have an id" in errors
         assert "each skill must have a name" in errors

@@ -27,7 +27,12 @@ from typing import Any
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 
-from agent_layer.analytics import AnalyticsConfig, AnalyticsInstance, build_agent_event, create_analytics
+from agent_layer.analytics import (
+    AnalyticsConfig,
+    AnalyticsInstance,
+    build_agent_event,
+    create_analytics,
+)
 
 _instance: AnalyticsInstance | None = None
 

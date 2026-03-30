@@ -4,9 +4,16 @@ from ..types import CheckResult, ScanConfig
 from .utils import safe_fetch
 
 RATE_LIMIT_HEADERS = [
-    "x-ratelimit-limit", "x-ratelimit-remaining", "x-ratelimit-reset",
-    "ratelimit-limit", "ratelimit-remaining", "ratelimit-reset", "ratelimit-policy",
-    "retry-after", "x-rate-limit-limit", "x-rate-limit-remaining",
+    "x-ratelimit-limit",
+    "x-ratelimit-remaining",
+    "x-ratelimit-reset",
+    "ratelimit-limit",
+    "ratelimit-remaining",
+    "ratelimit-reset",
+    "ratelimit-policy",
+    "retry-after",
+    "x-rate-limit-limit",
+    "x-rate-limit-remaining",
 ]
 
 
@@ -34,7 +41,9 @@ async def check_rate_limits(config: ScanConfig) -> CheckResult:
         base.details = details
         return base
 
-    has_limit = any("limit" in h and "remaining" not in h and "reset" not in h for h in found_headers)
+    has_limit = any(
+        "limit" in h and "remaining" not in h and "reset" not in h for h in found_headers
+    )
     has_remaining = any("remaining" in h for h in found_headers)
     has_reset = any("reset" in h or h == "retry-after" for h in found_headers)
 
@@ -53,6 +62,8 @@ async def check_rate_limits(config: ScanConfig) -> CheckResult:
     base.message = f"Found rate limit headers: {', '.join(found_headers)}"
     base.details = details
     if score < 10:
-        base.suggestion = "Include limit, remaining, and reset headers for complete agent rate-limit awareness"
+        base.suggestion = (
+            "Include limit, remaining, and reset headers for complete agent rate-limit awareness"
+        )
 
     return base

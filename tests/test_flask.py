@@ -105,8 +105,32 @@ class TestErrorHandling:
         assert resp.json["error"]["code"] == "test_fail"
 
 
+class TestMcpServer:
+    def test_mcp_initialize(self):
+        from agent_layer.core.mcp import McpServerConfig
+        client = _make_app(mcp=McpServerConfig(name="test-api"))
+        resp = client.post("/mcp", json={
+            "jsonrpc": "2.0", "id": 1, "method": "initialize",
+        }, content_type="application/json")
+        assert resp.status_code == 200
+        assert resp.json["result"]["serverInfo"]["name"] == "test-api"
+
+    def test_mcp_sse(self):
+        from agent_layer.core.mcp import McpServerConfig
+        client = _make_app(mcp=McpServerConfig(name="test"))
+        resp = client.get("/mcp")
+        assert resp.status_code == 200
+
+    def test_mcp_delete(self):
+        from agent_layer.core.mcp import McpServerConfig
+        client = _make_app(mcp=McpServerConfig(name="test"))
+        resp = client.delete("/mcp")
+        assert resp.status_code == 200
+
+
 class TestFullIntegration:
     def test_all_features(self):
+        from agent_layer.core.mcp import McpServerConfig
         client = _make_app(
             agents_txt=AgentsTxtConfig(
                 rules=[AgentsTxtRule(agent="*", permission=Permission.ALLOW)]
@@ -116,6 +140,7 @@ class TestFullIntegration:
             a2a=A2AConfig(
                 card=A2AAgentCard(name="FullAgent", url="https://agent.example.com")
             ),
+            mcp=McpServerConfig(name="Full API"),
         )
         assert client.get("/agents.txt").status_code == 200
         assert client.get("/llms.txt").status_code == 200
@@ -123,3 +148,7 @@ class TestFullIntegration:
         assert client.get("/.well-known/ai").status_code == 200
         assert client.get("/.well-known/agent.json").status_code == 200
         assert client.get("/hello").status_code == 200
+        # MCP
+        resp = client.post("/mcp", json={"jsonrpc": "2.0", "id": 1, "method": "ping"},
+                          content_type="application/json")
+        assert resp.status_code == 200

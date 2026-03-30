@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 authors = [
     { name = "LightLayer", email = "hello@lightlayer.dev" },
 ]
-keywords = ["ai", "agent", "middleware", "llm", "a2a", "fastapi", "flask", "django"]
+keywords = ["ai", "agent", "middleware", "llm", "a2a", "mcp", "fastapi", "flask", "django"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

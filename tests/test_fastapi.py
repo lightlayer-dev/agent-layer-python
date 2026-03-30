@@ -6,9 +6,14 @@ from fastapi.testclient import TestClient
 
 from agent_layer.core.a2a import A2AAgentCard, A2AConfig, A2ASkill
 from agent_layer.core.agents_txt import AgentsTxtConfig, AgentsTxtRule, Permission
+from agent_layer.core.analytics import AnalyticsConfig
 from agent_layer.core.discovery import AIManifest, DiscoveryConfig
 from agent_layer.core.llms_txt import LlmsTxtConfig, LlmsTxtSection
+from agent_layer.core.mcp import McpServerConfig, McpToolDefinition
 from agent_layer.core.rate_limit import RateLimitConfig
+from agent_layer.core.unified_discovery import UnifiedDiscoveryConfig, UnifiedSkill
+from agent_layer.core.agent_meta import AgentMetaConfig
+from agent_layer.core.oauth2 import OAuth2Config, OAuth2MiddlewareConfig
 from agent_layer.fastapi import AgentLayer
 
 
@@ -146,6 +151,101 @@ class TestErrorHandling:
         assert data["error"]["code"] == "test_fail"
 
 
+class TestMcpServer:
+    def test_mcp_initialize(self):
+        client = _make_app(mcp=McpServerConfig(name="test-api", version="1.0.0"))
+        resp = client.post("/mcp", json={
+            "jsonrpc": "2.0", "id": 1, "method": "initialize",
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["result"]["serverInfo"]["name"] == "test-api"
+
+    def test_mcp_tools_list(self):
+        client = _make_app(mcp=McpServerConfig(
+            name="test",
+            tools=[McpToolDefinition(name="search", description="Search")],
+        ))
+        resp = client.post("/mcp", json={
+            "jsonrpc": "2.0", "id": 1, "method": "tools/list",
+        })
+        assert resp.status_code == 200
+        tools = resp.json()["result"]["tools"]
+        assert len(tools) == 1
+        assert tools[0]["name"] == "search"
+
+    def test_mcp_sse(self):
+        client = _make_app(mcp=McpServerConfig(name="test"))
+        resp = client.get("/mcp")
+        assert resp.status_code == 200
+        assert "text/event-stream" in resp.headers["content-type"]
+
+    def test_mcp_delete(self):
+        client = _make_app(mcp=McpServerConfig(name="test"))
+        resp = client.delete("/mcp")
+        assert resp.status_code == 200
+        assert resp.json()["ok"] is True
+
+    def test_mcp_invalid_request(self):
+        client = _make_app(mcp=McpServerConfig(name="test"))
+        resp = client.post("/mcp", json={"not": "jsonrpc"})
+        assert resp.status_code == 400
+
+
+class TestAnalytics:
+    def test_records_agent_events(self):
+        events = []
+        client = _make_app(
+            analytics=AnalyticsConfig(on_event=lambda e: events.append(e))
+        )
+        client.get("/hello", headers={"User-Agent": "GPTBot/1.0"})
+        assert len(events) == 1
+        assert events[0].agent == "GPTBot"
+
+    def test_ignores_non_agents(self):
+        events = []
+        client = _make_app(
+            analytics=AnalyticsConfig(on_event=lambda e: events.append(e))
+        )
+        client.get("/hello", headers={"User-Agent": "Mozilla/5.0"})
+        assert len(events) == 0
+
+
+class TestUnifiedDiscovery:
+    def test_serves_all_formats(self):
+        client = _make_app(
+            unified_discovery=UnifiedDiscoveryConfig(
+                name="Test API",
+                url="https://api.example.com",
+                skills=[UnifiedSkill(id="s1", name="Skill 1")],
+                agents_txt_rules=[AgentsTxtRule(agent="*", permission=Permission.ALLOW)],
+            )
+        )
+        assert client.get("/.well-known/ai").status_code == 200
+        assert client.get("/.well-known/agent.json").status_code == 200
+        assert client.get("/agents.txt").status_code == 200
+        assert client.get("/llms.txt").status_code == 200
+        assert client.get("/llms-full.txt").status_code == 200
+
+
+class TestOAuth2Metadata:
+    def test_serves_metadata(self):
+        client = _make_app(
+            oauth2=OAuth2MiddlewareConfig(
+                oauth2=OAuth2Config(
+                    client_id="c1",
+                    issuer="https://auth.example.com",
+                    authorization_endpoint="https://auth.example.com/authorize",
+                    token_endpoint="https://auth.example.com/token",
+                )
+            )
+        )
+        resp = client.get("/.well-known/oauth-authorization-server")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["issuer"] == "https://auth.example.com"
+
+
 class TestFullIntegration:
     def test_all_features(self):
         client = _make_app(
@@ -160,6 +260,7 @@ class TestFullIntegration:
                     url="https://agent.example.com",
                 )
             ),
+            mcp=McpServerConfig(name="Full API"),
         )
         assert client.get("/agents.txt").status_code == 200
         assert client.get("/llms.txt").status_code == 200
@@ -168,3 +269,6 @@ class TestFullIntegration:
         assert client.get("/.well-known/ai/json-ld").status_code == 200
         assert client.get("/.well-known/agent.json").status_code == 200
         assert client.get("/hello").status_code == 200
+        # MCP
+        resp = client.post("/mcp", json={"jsonrpc": "2.0", "id": 1, "method": "ping"})
+        assert resp.status_code == 200

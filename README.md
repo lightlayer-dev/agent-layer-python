@@ -14,6 +14,15 @@ The Python port of [@agent-layer/core](https://github.com/lightlayer-dev/agent-l
 | **A2A Agent Card** | `/.well-known/agent.json` per Google's A2A protocol |
 | **Structured Errors** | Agent-friendly error envelopes with retry logic |
 | **Rate Limiting** | In-memory sliding window rate limiter |
+| **MCP Server** | JSON-RPC 2.0 server with tool definitions and streamable HTTP transport |
+| **Analytics** | Agent detection via User-Agent, event buffering, pluggable flush |
+| **API Keys** | Key generation, validation, scopes, pluggable store |
+| **x402 Payments** | HTTP 402 payment verification, headers, middleware |
+| **Agent Identity** | SPIFFE ID parsing, JWT claims, authz policies, audit events |
+| **Unified Discovery** | Multi-format content negotiation (MCP/A2A/llms.txt/agents.txt from one endpoint) |
+| **AG-UI Streaming** | Server-Sent Events streaming for CopilotKit (AG-UI protocol) |
+| **OAuth2** | Authorization server metadata, PKCE, token validation |
+| **Agent Meta** | HTML transforms for agent accessibility (data attributes, ARIA, meta tags) |
 
 ## Install
 
@@ -41,6 +50,9 @@ from agent_layer.core.agents_txt import AgentsTxtConfig, AgentsTxtRule, Permissi
 from agent_layer.core.llms_txt import LlmsTxtConfig
 from agent_layer.core.discovery import DiscoveryConfig, AIManifest
 from agent_layer.core.a2a import A2AConfig, A2AAgentCard, A2ASkill
+from agent_layer.core.mcp import McpServerConfig
+from agent_layer.core.analytics import AnalyticsConfig
+from agent_layer.core.rate_limit import RateLimitConfig
 
 app = FastAPI()
 
@@ -70,6 +82,8 @@ agent = AgentLayer(
             ],
         )
     ),
+    mcp=McpServerConfig(name="My API", version="1.0.0"),
+    analytics=AnalyticsConfig(on_event=lambda e: print(f"Agent: {e.agent}")),
     rate_limit=RateLimitConfig(max=100, window_ms=60_000),
 )
 
@@ -83,7 +97,10 @@ This gives you:
 - `GET /.well-known/ai` — AI discovery manifest
 - `GET /.well-known/ai/json-ld` — JSON-LD structured data
 - `GET /.well-known/agent.json` — A2A Agent Card
+- `POST /mcp` — MCP JSON-RPC 2.0 endpoint
+- `GET /mcp` — MCP SSE stream
 - Rate limiting on all requests with proper headers
+- Analytics tracking for AI agent requests
 - Structured error handling for `AgentError` exceptions
 
 ### Flask
@@ -123,113 +140,126 @@ AGENT_LAYER = {
 
 Each feature can be used standalone without a framework adapter:
 
-### agents.txt
+### MCP Server
 
 ```python
-from agent_layer.core.agents_txt import (
-    AgentsTxtConfig, AgentsTxtRule, Permission,
-    generate_agents_txt, parse_agents_txt, is_agent_allowed,
+from agent_layer.core.mcp import (
+    McpServerConfig, generate_server_info, generate_tool_definitions,
+    handle_json_rpc, McpToolDefinition,
 )
 
-# Generate
-config = AgentsTxtConfig(
-    comment="AI Agent Access Policy",
-    rules=[
-        AgentsTxtRule(agent="*", permission=Permission.ALLOW, paths=["/"]),
-        AgentsTxtRule(agent="BadBot", permission=Permission.DISALLOW, paths=["/"]),
-    ],
-)
-txt = generate_agents_txt(config)
+# Auto-generate tools from routes
+tools = generate_tool_definitions(routes)
 
-# Parse
-rules = parse_agents_txt(txt)
+# Or define manually
+tools = [McpToolDefinition(name="search", description="Search the web")]
 
-# Check
-is_agent_allowed(rules, "GPTBot", "/api")      # True
-is_agent_allowed(rules, "BadBot", "/api")       # False
+# Handle JSON-RPC requests
+result = await handle_json_rpc(request_body, server_info, tools)
 ```
 
-### llms.txt
+### Analytics
 
 ```python
-from agent_layer.core.llms_txt import (
-    LlmsTxtConfig, LlmsTxtSection, RouteMetadata, RouteParameter,
-    generate_llms_txt, generate_llms_full_txt,
-)
+from agent_layer.core.analytics import detect_agent, AnalyticsConfig, create_analytics
 
-config = LlmsTxtConfig(
-    title="My API",
-    description="A powerful API",
-    sections=[
-        LlmsTxtSection(title="Authentication", content="Use Bearer tokens."),
-    ],
-)
+# Detect AI agents
+agent = detect_agent("GPTBot/1.0")  # Returns "GPTBot"
 
-# Basic
-txt = generate_llms_txt(config)
-
-# With route docs
-full = generate_llms_full_txt(config, routes=[
-    RouteMetadata(
-        method="GET", path="/users",
-        summary="List users",
-        parameters=[
-            RouteParameter(name="limit", location="query", description="Max results"),
-        ],
-    ),
-])
-```
-
-### Structured Errors
-
-```python
-from agent_layer.core.errors import AgentError, AgentErrorOptions
-
-# Raise in your route handlers — framework adapters catch these automatically
-raise AgentError(AgentErrorOptions(
-    code="user_not_found",
-    message="No user with that ID exists.",
-    status=404,
-    docs_url="https://docs.example.com/errors/user_not_found",
+# Full analytics with buffering
+analytics = create_analytics(AnalyticsConfig(
+    endpoint="https://analytics.example.com",
+    on_event=lambda e: print(f"Agent {e.agent} hit {e.path}"),
 ))
-
-# Response:
-# {
-#   "error": {
-#     "type": "not_found_error",
-#     "code": "user_not_found",
-#     "message": "No user with that ID exists.",
-#     "status": 404,
-#     "is_retriable": false,
-#     "docs_url": "https://docs.example.com/errors/user_not_found"
-#   }
-# }
 ```
 
-### Rate Limiting
+### API Keys
 
 ```python
-from agent_layer.core.rate_limit import RateLimitConfig, create_rate_limiter
+from agent_layer.core.api_keys import (
+    create_api_key, validate_api_key, has_scope,
+    MemoryApiKeyStore, ScopedApiKey,
+)
 
-check = create_rate_limiter(RateLimitConfig(
-    max=100,
-    window_ms=60_000,
-    key_fn=lambda req: req.client.host,  # Per-IP limiting
-))
+# Generate key
+result = create_api_key()  # al_<32 hex chars>
 
-result = await check(request)
-if not result.allowed:
-    # Return 429 with result.retry_after seconds
-    pass
+# Validate
+store = MemoryApiKeyStore()
+await store.set(ScopedApiKey(key_id="k1", key=result.key, scopes=["read"]))
+validation = await validate_api_key(result.key, store)
+```
+
+### x402 Payments
+
+```python
+from agent_layer.core.x402 import X402Config, X402RouteConfig, handle_x402
+
+config = X402Config(routes={
+    "GET /api/weather": X402RouteConfig(pay_to="0xABC", price="$0.01"),
+})
+result = await handle_x402("GET", "/api/weather", url, payment_header, config)
+```
+
+### Agent Identity
+
+```python
+from agent_layer.core.agent_identity import (
+    AgentIdentityConfig, AuthzContext, handle_require_identity,
+    parse_spiffe_id,
+)
+
+config = AgentIdentityConfig(
+    trusted_issuers=["https://auth.example.com"],
+    default_policy="allow",
+)
+result = await handle_require_identity(auth_header, config, AuthzContext(method="GET", path="/api"))
+```
+
+### AG-UI Streaming
+
+```python
+from agent_layer.core.ag_ui import create_ag_ui_emitter, AG_UI_HEADERS
+
+emitter = create_ag_ui_emitter(write_fn)
+emitter.run_started()
+emitter.text_message("Hello from the agent!")
+emitter.run_finished()
+```
+
+### OAuth2
+
+```python
+from agent_layer.core.oauth2 import (
+    generate_pkce, build_authorization_url, validate_access_token,
+    OAuth2Config,
+)
+
+pkce = generate_pkce()
+url = build_authorization_url(config, pkce=pkce)
+result = validate_access_token(token, config)
+```
+
+### Agent Meta
+
+```python
+from agent_layer.core.agent_meta import AgentMetaConfig, transform_html
+
+config = AgentMetaConfig(meta_tags={"ai-purpose": "api-docs"})
+html = transform_html("<html><body>...</body></html>", config)
+# Adds data-agent-id="root" to <body>, injects meta tags, ARIA landmarks
 ```
 
 ## Python Version
 
 Requires Python 3.10+.
 
-## TypeScript Version
+## Ecosystem
 
-Looking for the TypeScript/Node.js version? See [agent-layer-ts](https://github.com/lightlayer-dev/agent-layer-ts).
+| Language | Library | Frameworks |
+|----------|---------|------------|
+| **TypeScript** | [agent-layer-ts](https://github.com/lightlayer-dev/agent-layer-ts) | Express, Koa, Hono, Fastify |
+| **Go** | [agent-layer-go](https://github.com/lightlayer-dev/agent-layer-go) | Gin, Echo, Chi |
 
 ## License
 

@@ -130,6 +130,37 @@ class TestErrorHandling:
         assert data["error"]["code"] == "test_fail"
 
 
+class TestMcpServer:
+    def test_mcp_initialize(self):
+        from agent_layer.core.mcp import McpServerConfig
+        middleware = _make_middleware(mcp=McpServerConfig(name="test-api"))
+        factory = RequestFactory()
+        request = factory.post(
+            "/mcp", data='{"jsonrpc":"2.0","id":1,"method":"initialize"}',
+            content_type="application/json",
+        )
+        response = middleware(request)
+        assert response.status_code == 200
+        import json
+        data = json.loads(response.content)
+        assert data["result"]["serverInfo"]["name"] == "test-api"
+
+    def test_mcp_sse(self):
+        from agent_layer.core.mcp import McpServerConfig
+        middleware = _make_middleware(mcp=McpServerConfig(name="test"))
+        factory = RequestFactory()
+        response = middleware(factory.get("/mcp"))
+        assert response.status_code == 200
+        assert "text/event-stream" in response["Content-Type"]
+
+    def test_mcp_delete(self):
+        from agent_layer.core.mcp import McpServerConfig
+        middleware = _make_middleware(mcp=McpServerConfig(name="test"))
+        factory = RequestFactory()
+        response = middleware(factory.delete("/mcp"))
+        assert response.status_code == 200
+
+
 class TestPassthrough:
     def test_unmatched_routes_pass_through(self):
         middleware = _make_middleware(

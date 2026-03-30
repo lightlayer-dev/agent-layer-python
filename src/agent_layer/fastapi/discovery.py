@@ -21,6 +21,7 @@ def discovery_routes(config: DiscoveryConfig) -> APIRouter:
         return generate_json_ld(config)
 
     if config.openapi_spec:
+
         @router.get("/openapi.json")
         async def openapi_spec():
             return config.openapi_spec

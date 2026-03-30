@@ -29,13 +29,15 @@ from agent_layer.errors import format_error
 
 SUPPORTED_CREDENTIAL_TYPES = ("api_key", "oauth2_client_credentials", "bearer")
 
-EXEMPT_PATHS = frozenset({
-    "/agent/register",
-    "/llms.txt",
-    "/llms-full.txt",
-    "/agents.txt",
-    "/robots.txt",
-})
+EXEMPT_PATHS = frozenset(
+    {
+        "/agent/register",
+        "/llms.txt",
+        "/llms-full.txt",
+        "/agents.txt",
+        "/robots.txt",
+    }
+)
 
 
 @dataclass
@@ -142,6 +144,7 @@ class HandlerResult:
 
 # ── Rate Limiting (in-memory sliding window) ─────────────────────────────
 
+
 @dataclass
 class _RateLimitWindow:
     count: int
@@ -168,12 +171,14 @@ def verify_webhook_signature(body: str, secret: str, signature: str) -> bool:
 
 
 def _make_error(status: int, code: str, message: str) -> dict[str, Any]:
-    envelope = format_error(AgentErrorOptions(
-        status=status,
-        code=code,
-        message=message,
-        is_retriable=status in (429, 502),
-    ))
+    envelope = format_error(
+        AgentErrorOptions(
+            status=status,
+            code=code,
+            message=message,
+            is_retriable=status in (429, 502),
+        )
+    )
     return envelope.model_dump(exclude_none=True)
 
 
@@ -215,14 +220,16 @@ class OnboardingHandler:
         return True
 
     async def _call_webhook(self, webhook_req: WebhookRequest) -> dict[str, Any]:
-        body_str = json.dumps({
-            "agent_id": webhook_req.agent_id,
-            "agent_name": webhook_req.agent_name,
-            "agent_provider": webhook_req.agent_provider,
-            "identity_verified": webhook_req.identity_verified,
-            "request_ip": webhook_req.request_ip,
-            "timestamp": webhook_req.timestamp,
-        })
+        body_str = json.dumps(
+            {
+                "agent_id": webhook_req.agent_id,
+                "agent_name": webhook_req.agent_name,
+                "agent_provider": webhook_req.agent_provider,
+                "identity_verified": webhook_req.identity_verified,
+                "request_ip": webhook_req.request_ip,
+                "timestamp": webhook_req.timestamp,
+            }
+        )
 
         headers: dict[str, str] = {"Content-Type": "application/json"}
         if self.config.webhook_secret:
@@ -237,9 +244,7 @@ class OnboardingHandler:
                 headers=headers,
             )
             if resp.status_code >= 400:
-                raise RuntimeError(
-                    f"Webhook returned status {resp.status_code}: {resp.text[:200]}"
-                )
+                raise RuntimeError(f"Webhook returned status {resp.status_code}: {resp.text[:200]}")
             return resp.json()  # type: ignore[no-any-return]
 
     async def handle_register(
@@ -291,8 +296,7 @@ class OnboardingHandler:
         # Check allowed providers.
         if self.config.allowed_providers:
             allowed = any(
-                p.lower() == body.agent_provider.lower()
-                for p in self.config.allowed_providers
+                p.lower() == body.agent_provider.lower() for p in self.config.allowed_providers
             )
             if not allowed:
                 return HandlerResult(

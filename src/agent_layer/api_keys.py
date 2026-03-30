@@ -132,7 +132,9 @@ async def validate_api_key(
 
     if key.expires_at is not None:
         now = datetime.now(timezone.utc)
-        expires = key.expires_at if key.expires_at.tzinfo else key.expires_at.replace(tzinfo=timezone.utc)
+        expires = (
+            key.expires_at if key.expires_at.tzinfo else key.expires_at.replace(tzinfo=timezone.utc)
+        )
         if expires <= now:
             return ApiKeyValidationResult(valid=False, error="api_key_expired")
 

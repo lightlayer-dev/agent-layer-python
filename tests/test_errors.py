@@ -6,7 +6,9 @@ from agent_layer.types import AgentErrorOptions
 
 class TestFormatError:
     def test_basic_error(self):
-        envelope = format_error(AgentErrorOptions(code="bad_request", message="Invalid input", status=400))
+        envelope = format_error(
+            AgentErrorOptions(code="bad_request", message="Invalid input", status=400)
+        )
         assert envelope.type == "invalid_request_error"
         assert envelope.code == "bad_request"
         assert envelope.status == 400
@@ -25,10 +27,16 @@ class TestFormatError:
         assert envelope.type == "custom_error"
 
     def test_optional_fields(self):
-        envelope = format_error(AgentErrorOptions(
-            code="x", message="y", status=400,
-            retry_after=30, param="email", docs_url="https://docs.example.com",
-        ))
+        envelope = format_error(
+            AgentErrorOptions(
+                code="x",
+                message="y",
+                status=400,
+                retry_after=30,
+                param="email",
+                docs_url="https://docs.example.com",
+            )
+        )
         assert envelope.retry_after == 30
         assert envelope.param == "email"
         assert envelope.docs_url == "https://docs.example.com"

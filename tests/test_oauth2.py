@@ -146,7 +146,9 @@ class TestValidateAccessToken:
 
     def test_valid_issuer(self):
         config = _config(issuer="https://auth.example.com")
-        token = _make_jwt({"sub": "u", "exp": int(time.time()) + 3600, "iss": "https://auth.example.com"})
+        token = _make_jwt(
+            {"sub": "u", "exp": int(time.time()) + 3600, "iss": "https://auth.example.com"}
+        )
         result = validate_access_token(token, config)
         assert result.valid is True
 

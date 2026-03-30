@@ -239,18 +239,22 @@ class AgUiEmitter:
     # ── Lifecycle ──
 
     def run_started(self, parent_run_id: Optional[str] = None) -> None:
-        self.emit(RunStartedEvent(
-            thread_id=self.thread_id,
-            run_id=self.run_id,
-            parent_run_id=parent_run_id,
-        ))
+        self.emit(
+            RunStartedEvent(
+                thread_id=self.thread_id,
+                run_id=self.run_id,
+                parent_run_id=parent_run_id,
+            )
+        )
 
     def run_finished(self, result: Any = None) -> None:
-        self.emit(RunFinishedEvent(
-            thread_id=self.thread_id,
-            run_id=self.run_id,
-            result=result,
-        ))
+        self.emit(
+            RunFinishedEvent(
+                thread_id=self.thread_id,
+                run_id=self.run_id,
+                result=result,
+            )
+        )
 
     def run_error(self, message: str, code: Optional[str] = None) -> None:
         self.emit(RunErrorEvent(message=message, code=code))
@@ -263,13 +267,9 @@ class AgUiEmitter:
 
     # ── Text messages ──
 
-    def text_start(
-        self, role: AgUiRole = "assistant", message_id: Optional[str] = None
-    ) -> str:
+    def text_start(self, role: AgUiRole = "assistant", message_id: Optional[str] = None) -> str:
         self._current_message_id = message_id or str(uuid.uuid4())
-        self.emit(TextMessageStartEvent(
-            message_id=self._current_message_id, role=role
-        ))
+        self.emit(TextMessageStartEvent(message_id=self._current_message_id, role=role))
         return self._current_message_id
 
     def text_delta(self, delta: str, message_id: Optional[str] = None) -> None:
@@ -307,11 +307,13 @@ class AgUiEmitter:
         parent_message_id: Optional[str] = None,
     ) -> str:
         self._current_tool_call_id = tool_call_id or str(uuid.uuid4())
-        self.emit(ToolCallStartEvent(
-            tool_call_id=self._current_tool_call_id,
-            tool_call_name=tool_call_name,
-            parent_message_id=parent_message_id,
-        ))
+        self.emit(
+            ToolCallStartEvent(
+                tool_call_id=self._current_tool_call_id,
+                tool_call_name=tool_call_name,
+                parent_message_id=parent_message_id,
+            )
+        )
         return self._current_tool_call_id
 
     def tool_call_args(self, delta: str, tool_call_id: Optional[str] = None) -> None:
@@ -333,9 +335,7 @@ class AgUiEmitter:
     def tool_call_result(self, result: str, tool_call_id: Optional[str] = None) -> None:
         tid = tool_call_id or self._current_tool_call_id
         if not tid:
-            raise RuntimeError(
-                "tool_call_result called without an active tool call."
-            )
+            raise RuntimeError("tool_call_result called without an active tool call.")
         self.emit(ToolCallResultEvent(tool_call_id=tid, result=result))
         if tid == self._current_tool_call_id:
             self._current_tool_call_id = None
@@ -400,6 +400,7 @@ def orchestrate_stream(
     try:
         if is_async:
             import asyncio
+
             asyncio.get_event_loop().run_until_complete(handler(request_obj, emitter))
         else:
             handler(request_obj, emitter)

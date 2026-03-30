@@ -16,8 +16,14 @@ from agent_layer.django.ag_ui import ag_ui_stream as django_ag_ui_stream
 from agent_layer.django.api_keys import require_api_key as django_require_api_key
 from agent_layer.django.oauth2 import oauth2_urlpatterns
 from agent_layer.django.robots_txt import robots_txt_urlpatterns
-from agent_layer.django.security_headers import SecurityHeadersMiddleware, security_headers_middleware_class
-from agent_layer.django.agent_onboarding import agent_onboarding_urlpatterns, AgentOnboardingAuthMiddleware
+from agent_layer.django.security_headers import (
+    SecurityHeadersMiddleware,
+    security_headers_middleware_class,
+)
+from agent_layer.django.agent_onboarding import (
+    agent_onboarding_urlpatterns,
+    AgentOnboardingAuthMiddleware,
+)
 from agent_layer.django.app import configure_agent_layer
 
 __all__ = [

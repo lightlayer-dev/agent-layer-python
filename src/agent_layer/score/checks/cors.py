@@ -16,7 +16,8 @@ async def check_cors(config: ScanConfig) -> CheckResult:
 
     # OPTIONS preflight
     res = await safe_fetch(
-        config.url, config,
+        config.url,
+        config,
         method="OPTIONS",
         headers={
             "Origin": "https://agent.example.com",
@@ -26,7 +27,8 @@ async def check_cors(config: ScanConfig) -> CheckResult:
 
     # Regular GET with Origin
     get_res = await safe_fetch(
-        config.url, config,
+        config.url,
+        config,
         headers={"Origin": "https://agent.example.com"},
     )
 
@@ -72,6 +74,8 @@ async def check_cors(config: ScanConfig) -> CheckResult:
     base.message = f"CORS: Allow-Origin={acao or 'none'}"
     base.details = details
     if score < 10:
-        base.suggestion = "Configure CORS with Allow-Methods, Allow-Headers, and Max-Age for optimal agent access"
+        base.suggestion = (
+            "Configure CORS with Allow-Methods, Allow-Headers, and Max-Age for optimal agent access"
+        )
 
     return base

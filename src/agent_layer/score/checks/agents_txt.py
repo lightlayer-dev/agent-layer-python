@@ -66,13 +66,19 @@ async def check_agents_txt(config: ScanConfig) -> CheckResult:
     elif len(features) >= 1:
         base.score = 6
         base.severity = "warn"
-        base.message = f"agents.txt found with {', '.join(features)} — consider adding more directives"
-        base.suggestion = "Add auth requirements and rate limits to give agents clear usage boundaries"
+        base.message = (
+            f"agents.txt found with {', '.join(features)} — consider adding more directives"
+        )
+        base.suggestion = (
+            "Add auth requirements and rate limits to give agents clear usage boundaries"
+        )
     else:
         base.score = 3
         base.severity = "warn"
         base.message = "agents.txt exists but contains no recognized directives"
-        base.suggestion = "Add User-Agent, Allow/Disallow, and rate-limit directives. See @agent-layer docs."
+        base.suggestion = (
+            "Add User-Agent, Allow/Disallow, and rate-limit directives. See @agent-layer docs."
+        )
 
     base.details = details
     return base

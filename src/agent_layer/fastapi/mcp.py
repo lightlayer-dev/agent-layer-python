@@ -24,7 +24,9 @@ from agent_layer.mcp import (
 )
 
 
-def mcp_routes(config: McpServerConfig, tool_call_handler: ToolCallHandler | None = None) -> APIRouter:
+def mcp_routes(
+    config: McpServerConfig, tool_call_handler: ToolCallHandler | None = None
+) -> APIRouter:
     """Create a FastAPI router that serves an MCP-compatible server.
 
     Args:

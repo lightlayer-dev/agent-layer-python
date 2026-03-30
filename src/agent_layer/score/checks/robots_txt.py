@@ -4,8 +4,17 @@ from ..types import CheckResult, ScanConfig
 from .utils import safe_fetch, resolve_url
 
 AI_AGENTS = [
-    "GPTBot", "ChatGPT-User", "Google-Extended", "Anthropic", "ClaudeBot",
-    "CCBot", "Amazonbot", "Bytespider", "Applebot-Extended", "PerplexityBot", "Cohere-ai",
+    "GPTBot",
+    "ChatGPT-User",
+    "Google-Extended",
+    "Anthropic",
+    "ClaudeBot",
+    "CCBot",
+    "Amazonbot",
+    "Bytespider",
+    "Applebot-Extended",
+    "PerplexityBot",
+    "Cohere-ai",
 ]
 
 
@@ -31,7 +40,9 @@ async def check_robots_txt(config: ScanConfig) -> CheckResult:
         base.score = 3
         base.severity = "warn"
         base.message = "No robots.txt found — agents will assume full access"
-        base.suggestion = "Add robots.txt with explicit AI agent rules to signal intentional access control"
+        base.suggestion = (
+            "Add robots.txt with explicit AI agent rules to signal intentional access control"
+        )
         base.details = {"status": res.status_code}
         return base
 

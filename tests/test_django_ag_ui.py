@@ -31,6 +31,7 @@ def rf():
 
 def test_ag_ui_stream_returns_streaming_response(rf):
     """Test that AG-UI stream returns a StreamingHttpResponse."""
+
     def handler(request, emit):
         emit.run_started()
         emit.run_finished()
@@ -45,6 +46,7 @@ def test_ag_ui_stream_returns_streaming_response(rf):
 
 def test_ag_ui_stream_events(rf):
     """Test that AG-UI stream emits correct event sequence."""
+
     def handler(request, emit):
         emit.run_started()
         emit.text_start()
@@ -67,6 +69,7 @@ def test_ag_ui_stream_events(rf):
 
 def test_ag_ui_stream_sse_headers(rf):
     """Test SSE headers are set correctly."""
+
     def handler(request, emit):
         emit.run_started()
         emit.run_finished()
@@ -81,6 +84,7 @@ def test_ag_ui_stream_sse_headers(rf):
 
 def test_ag_ui_stream_thread_id_from_body(rf):
     """Test that threadId is extracted from request body."""
+
     def handler(request, emit):
         emit.run_started()
         emit.run_finished()
@@ -102,6 +106,7 @@ def test_ag_ui_stream_thread_id_from_body(rf):
 
 def test_ag_ui_stream_error_handling(rf):
     """Test that handler errors produce RUN_ERROR events."""
+
     def handler(request, emit):
         emit.run_started()
         raise ValueError("Something went wrong")

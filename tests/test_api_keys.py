@@ -60,9 +60,7 @@ class TestCreateApiKey:
 
     def test_optional_fields(self):
         expires = datetime(2030, 1, 1, tzinfo=timezone.utc)
-        _, result = _make_store_and_key(
-            expires_at=expires, metadata={"env": "test"}
-        )
+        _, result = _make_store_and_key(expires_at=expires, metadata={"env": "test"})
         assert result.key.expires_at == expires
         assert result.key.metadata == {"env": "test"}
 
@@ -107,15 +105,11 @@ class TestValidateApiKey:
 
 class TestHasScope:
     def test_single_scope_present(self):
-        key = ScopedApiKey(
-            key_id="k1", company_id="c", user_id="u", scopes=["read", "write"]
-        )
+        key = ScopedApiKey(key_id="k1", company_id="c", user_id="u", scopes=["read", "write"])
         assert has_scope(key, "read") is True
 
     def test_single_scope_missing(self):
-        key = ScopedApiKey(
-            key_id="k1", company_id="c", user_id="u", scopes=["read"]
-        )
+        key = ScopedApiKey(key_id="k1", company_id="c", user_id="u", scopes=["read"])
         assert has_scope(key, "write") is False
 
     def test_multiple_scopes_all_present(self):
@@ -125,22 +119,16 @@ class TestHasScope:
         assert has_scope(key, ["read", "write"]) is True
 
     def test_multiple_scopes_some_missing(self):
-        key = ScopedApiKey(
-            key_id="k1", company_id="c", user_id="u", scopes=["read"]
-        )
+        key = ScopedApiKey(key_id="k1", company_id="c", user_id="u", scopes=["read"])
         assert has_scope(key, ["read", "write"]) is False
 
     def test_wildcard_grants_all(self):
-        key = ScopedApiKey(
-            key_id="k1", company_id="c", user_id="u", scopes=["*"]
-        )
+        key = ScopedApiKey(key_id="k1", company_id="c", user_id="u", scopes=["*"])
         assert has_scope(key, "anything") is True
         assert has_scope(key, ["read", "write", "admin"]) is True
 
     def test_empty_required(self):
-        key = ScopedApiKey(
-            key_id="k1", company_id="c", user_id="u", scopes=["read"]
-        )
+        key = ScopedApiKey(key_id="k1", company_id="c", user_id="u", scopes=["read"])
         assert has_scope(key, []) is True
 
 
@@ -155,9 +143,7 @@ class TestMemoryApiKeyStore:
 
     def test_set_and_delete(self):
         store = MemoryApiKeyStore()
-        key = ScopedApiKey(
-            key_id="k1", company_id="c", user_id="u", scopes=["read"]
-        )
+        key = ScopedApiKey(key_id="k1", company_id="c", user_id="u", scopes=["read"])
         store.set("raw", key)
         assert store.size == 1
         store.delete("raw")

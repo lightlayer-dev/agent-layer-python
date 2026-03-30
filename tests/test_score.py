@@ -14,12 +14,17 @@ from agent_layer.score.checks.utils import resolve_url
 
 # -- Utils --
 
+
 def test_resolve_url():
     assert resolve_url("https://example.com/foo", "/bar") == "https://example.com/bar"
-    assert resolve_url("https://example.com:8080/x", "/.well-known/ai") == "https://example.com:8080/.well-known/ai"
+    assert (
+        resolve_url("https://example.com:8080/x", "/.well-known/ai")
+        == "https://example.com:8080/.well-known/ai"
+    )
 
 
 # -- Reporter --
+
 
 def test_format_report_basic():
     report = ScoreReport(
@@ -27,7 +32,14 @@ def test_format_report_basic():
         timestamp="2026-01-01T00:00:00Z",
         score=75,
         checks=[
-            CheckResult(id="test", name="Test Check", score=7, max_score=10, severity="warn", message="Partial pass"),
+            CheckResult(
+                id="test",
+                name="Test Check",
+                score=7,
+                max_score=10,
+                severity="warn",
+                message="Partial pass",
+            ),
         ],
         duration_ms=123,
     )
@@ -43,8 +55,15 @@ def test_format_report_with_suggestions():
         timestamp="2026-01-01T00:00:00Z",
         score=30,
         checks=[
-            CheckResult(id="fail1", name="Fail Check", score=0, max_score=10, severity="fail",
-                        message="Failed", suggestion="Fix this thing"),
+            CheckResult(
+                id="fail1",
+                name="Fail Check",
+                score=0,
+                max_score=10,
+                severity="fail",
+                message="Failed",
+                suggestion="Fix this thing",
+            ),
         ],
         duration_ms=50,
     )
@@ -87,7 +106,7 @@ def test_badge_markdown():
     assert "[![Agent-Ready: 85/100]" in md
     assert "brightgreen" in md
     assert "https://github.com/lightlayer-dev/agent-layer-ts" in md
-    assert 'Scored by @agent-layer/score' in md
+    assert "Scored by @agent-layer/score" in md
 
     # Custom label
     md2 = badge_markdown(40, "My Score")
@@ -101,12 +120,16 @@ def test_badge_markdown():
 
 # -- Scanner --
 
+
 @pytest.mark.asyncio
 async def test_scan_normalizes_url():
     """scan() adds https:// if missing."""
+
     async def fake_check(config: ScanConfig) -> CheckResult:
         assert config.url.startswith("https://")
-        return CheckResult(id="fake", name="Fake", score=10, max_score=10, severity="pass", message="ok")
+        return CheckResult(
+            id="fake", name="Fake", score=10, max_score=10, severity="pass", message="ok"
+        )
 
     report = await scan("example.com", checks=[fake_check])
     assert report.url == "https://example.com"
@@ -116,6 +139,7 @@ async def test_scan_normalizes_url():
 @pytest.mark.asyncio
 async def test_scan_calculates_score():
     """Score is normalized to 0-100."""
+
     async def check_a(config: ScanConfig) -> CheckResult:
         return CheckResult(id="a", name="A", score=5, max_score=10, severity="warn", message="")
 
@@ -129,6 +153,7 @@ async def test_scan_calculates_score():
 
 
 # -- Check: structured errors --
+
 
 @pytest.mark.asyncio
 async def test_structured_errors_json():
@@ -160,11 +185,13 @@ async def test_structured_errors_html():
 
 # -- Check: discovery --
 
+
 @pytest.mark.asyncio
 async def test_discovery_found():
     from agent_layer.score.checks.discovery import check_discovery
 
     call_count = 0
+
     async def mock_fetch(url, config, **kw):
         nonlocal call_count
         call_count += 1
@@ -184,6 +211,7 @@ async def test_discovery_found():
 
 # -- Check: content type --
 
+
 @pytest.mark.asyncio
 async def test_content_type_full():
     from agent_layer.score.checks.content_type import check_content_type
@@ -199,6 +227,7 @@ async def test_content_type_full():
 
 # -- Check: response time --
 
+
 @pytest.mark.asyncio
 async def test_response_time_fast():
     from agent_layer.score.checks.response_time import check_response_time
@@ -213,6 +242,7 @@ async def test_response_time_fast():
 
 
 # -- Check: x402 --
+
 
 @pytest.mark.asyncio
 async def test_x402_no_support():
@@ -241,8 +271,10 @@ async def test_x402_no_support():
 
 # -- Grade labels --
 
+
 def test_grade_labels():
     from agent_layer.score.reporter import _grade
+
     assert _grade(95) == "A"
     assert _grade(85) == "B"
     assert _grade(75) == "C"

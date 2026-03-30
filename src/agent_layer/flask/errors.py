@@ -17,14 +17,14 @@ def agent_errors_handler(app: Flask) -> None:
 
     @app.errorhandler(404)
     def handle_404(e):
-        envelope = format_error(
-            AgentErrorOptions(code="not_found", message=str(e), status=404)
-        )
+        envelope = format_error(AgentErrorOptions(code="not_found", message=str(e), status=404))
         return jsonify({"error": envelope.model_dump(exclude_none=True)}), 404
 
     @app.errorhandler(500)
     def handle_500(e):
         envelope = format_error(
-            AgentErrorOptions(code="internal_error", message="An unexpected error occurred.", status=500)
+            AgentErrorOptions(
+                code="internal_error", message="An unexpected error occurred.", status=500
+            )
         )
         return jsonify({"error": envelope.model_dump(exclude_none=True)}), 500

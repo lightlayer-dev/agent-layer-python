@@ -102,7 +102,9 @@ async def test_register_missing_fields(config: OnboardingConfig) -> None:
 def _make_middleware(config: OnboardingConfig):
     def get_response(request):
         from django.http import JsonResponse
+
         return JsonResponse({"ok": True})
+
     return AgentOnboardingAuthMiddleware(get_response, config=config)
 
 
@@ -137,7 +139,9 @@ def test_auth_middleware_allows_exempt_paths(config: OnboardingConfig) -> None:
     for path in ["/llms.txt", "/robots.txt", "/agents.txt", "/agent/register"]:
         request = factory.get(path)
         resp = mw(request)
-        assert resp.status_code == 200, f"Expected 200 for exempt path {path}, got {resp.status_code}"
+        assert resp.status_code == 200, (
+            f"Expected 200 for exempt path {path}, got {resp.status_code}"
+        )
 
 
 @pytest.mark.asyncio

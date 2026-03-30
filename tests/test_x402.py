@@ -66,9 +66,7 @@ class TestBuildRequirements:
 
 class TestEncodeDecodePipeline:
     def test_round_trip(self):
-        config = X402RouteConfig(
-            pay_to="0xABC", price="$1", network="eip155:8453"
-        )
+        config = X402RouteConfig(pay_to="0xABC", price="$1", network="eip155:8453")
         pr = build_payment_required("https://example.com/api", config)
         encoded = encode_payment_required(pr)
         decoded = json.loads(base64.b64decode(encoded))
@@ -102,9 +100,7 @@ class TestEncodeDecodePipeline:
 class TestMatchRoute:
     def test_match(self):
         routes = {
-            "GET /api/weather": X402RouteConfig(
-                pay_to="0x1", price="$0.01", network="eip155:8453"
-            )
+            "GET /api/weather": X402RouteConfig(pay_to="0x1", price="$0.01", network="eip155:8453")
         }
         assert match_route("GET", "/api/weather", routes) is not None
         assert match_route("POST", "/api/weather", routes) is None

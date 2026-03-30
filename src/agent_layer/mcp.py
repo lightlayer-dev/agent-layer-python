@@ -157,7 +157,9 @@ def generate_tool_definitions(routes: list[RouteMetadata]) -> list[McpToolDefini
     return [
         McpToolDefinition(
             name=format_tool_name(route.method, route.path),
-            description=route.summary or route.description or f"{route.method.upper()} {route.path}",
+            description=route.summary
+            or route.description
+            or f"{route.method.upper()} {route.path}",
             input_schema=build_input_schema(route.parameters),
         )
         for route in routes
@@ -285,9 +287,7 @@ def make_default_tool_call_handler(
 ) -> ToolCallHandler:
     """Create the default tool-call handler that returns route dispatch info."""
 
-    async def default_tool_call_handler(
-        tool_name: str, args: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def default_tool_call_handler(tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
         route_info = tool_route_map.get(tool_name)
         if not route_info:
             parsed = parse_tool_name(tool_name)

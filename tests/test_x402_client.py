@@ -112,9 +112,7 @@ async def test_wrap_passes_through_non_402():
     client.request = AsyncMock(return_value=ok_response)
     signer = MockSigner()
 
-    result = await wrap_request_with_payment(
-        client, signer, "GET", "https://example.com/api/data"
-    )
+    result = await wrap_request_with_payment(client, signer, "GET", "https://example.com/api/data")
 
     assert result is ok_response
     client.request.assert_called_once()
@@ -127,14 +125,10 @@ async def test_wrap_signs_and_retries_on_402():
     success_response = httpx.Response(status_code=200, text="paid content")
 
     client = AsyncMock(spec=httpx.AsyncClient)
-    client.request = AsyncMock(
-        side_effect=[payment_response, success_response]
-    )
+    client.request = AsyncMock(side_effect=[payment_response, success_response])
     signer = MockSigner()
 
-    result = await wrap_request_with_payment(
-        client, signer, "GET", "https://example.com/api/data"
-    )
+    result = await wrap_request_with_payment(client, signer, "GET", "https://example.com/api/data")
 
     assert result is success_response
     assert client.request.call_count == 2
@@ -153,9 +147,7 @@ async def test_wrap_returns_402_when_no_header():
     client.request = AsyncMock(return_value=bare_402)
     signer = MockSigner()
 
-    result = await wrap_request_with_payment(
-        client, signer, "GET", "https://example.com"
-    )
+    result = await wrap_request_with_payment(client, signer, "GET", "https://example.com")
 
     assert result is bare_402
     signer.sign.assert_not_called()
@@ -169,9 +161,7 @@ async def test_wrap_returns_402_when_empty_accepts():
     client.request = AsyncMock(return_value=response)
     signer = MockSigner()
 
-    result = await wrap_request_with_payment(
-        client, signer, "GET", "https://example.com"
-    )
+    result = await wrap_request_with_payment(client, signer, "GET", "https://example.com")
 
     assert result is response
     signer.sign.assert_not_called()
@@ -183,9 +173,7 @@ async def test_wrap_preserves_existing_headers():
     success_response = httpx.Response(status_code=200, text="ok")
 
     client = AsyncMock(spec=httpx.AsyncClient)
-    client.request = AsyncMock(
-        side_effect=[payment_response, success_response]
-    )
+    client.request = AsyncMock(side_effect=[payment_response, success_response])
     signer = MockSigner()
 
     await wrap_request_with_payment(

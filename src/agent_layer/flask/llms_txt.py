@@ -20,6 +20,7 @@ def llms_txt_blueprint(
         return Response(generate_llms_txt(config), mimetype="text/plain")
 
     if routes is not None:
+
         @bp.route("/llms-full.txt")
         def llms_full_txt():
             return Response(generate_llms_full_txt(config, routes), mimetype="text/plain")

@@ -122,9 +122,7 @@ class TestSuccessfulPayment:
     """Valid payments should pass through with settlement header."""
 
     def test_valid_payment(self) -> None:
-        route_config = X402RouteConfig(
-            pay_to="0xabc123", price="$0.01", network="eip155:8453"
-        )
+        route_config = X402RouteConfig(pay_to="0xabc123", price="$0.01", network="eip155:8453")
         payment_header = _make_payment_header(route_config)
 
         mock_facilitator = AsyncMock()
@@ -151,9 +149,7 @@ class TestSuccessfulPayment:
         assert settlement["txHash"] == "0xfeed"
 
     def test_payment_data_attached_to_request(self) -> None:
-        route_config = X402RouteConfig(
-            pay_to="0xabc123", price="$0.01", network="eip155:8453"
-        )
+        route_config = X402RouteConfig(pay_to="0xabc123", price="$0.01", network="eip155:8453")
         payment_header = _make_payment_header(route_config)
 
         mock_facilitator = AsyncMock()
@@ -186,9 +182,7 @@ class TestVerificationFailed:
     """Invalid payments should be rejected with 402."""
 
     def test_bad_signature(self) -> None:
-        route_config = X402RouteConfig(
-            pay_to="0xabc123", price="$0.01", network="eip155:8453"
-        )
+        route_config = X402RouteConfig(pay_to="0xabc123", price="$0.01", network="eip155:8453")
         payment_header = _make_payment_header(route_config)
 
         mock_facilitator = AsyncMock()
@@ -211,9 +205,7 @@ class TestFacilitatorError:
     """Facilitator errors should return 502."""
 
     def test_network_error(self) -> None:
-        route_config = X402RouteConfig(
-            pay_to="0xabc123", price="$0.01", network="eip155:8453"
-        )
+        route_config = X402RouteConfig(pay_to="0xabc123", price="$0.01", network="eip155:8453")
         payment_header = _make_payment_header(route_config)
 
         mock_facilitator = AsyncMock()
@@ -234,9 +226,7 @@ class TestSettlementFailed:
     """Failed settlement should return 402."""
 
     def test_settlement_failure(self) -> None:
-        route_config = X402RouteConfig(
-            pay_to="0xabc123", price="$0.01", network="eip155:8453"
-        )
+        route_config = X402RouteConfig(pay_to="0xabc123", price="$0.01", network="eip155:8453")
         payment_header = _make_payment_header(route_config)
 
         mock_facilitator = AsyncMock()

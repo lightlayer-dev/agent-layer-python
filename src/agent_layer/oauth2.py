@@ -299,9 +299,7 @@ def validate_access_token(
     if required_scopes:
         missing = [s for s in required_scopes if s not in scopes]
         if missing:
-            return TokenValidationResult(
-                valid=False, error=f"missing_scopes: {', '.join(missing)}"
-            )
+            return TokenValidationResult(valid=False, error=f"missing_scopes: {', '.join(missing)}")
 
     decoded_token = DecodedAccessToken(
         sub=str(decoded.get("sub", "")),

@@ -60,13 +60,15 @@ class TestCheckIdentity:
 
     def test_valid_token(self, config):
         now = int(time.time())
-        token = _make_jwt({
-            "iss": "https://auth.example.com",
-            "sub": "agent-1",
-            "aud": "https://api.example.com",
-            "exp": now + 3600,
-            "iat": now,
-        })
+        token = _make_jwt(
+            {
+                "iss": "https://auth.example.com",
+                "sub": "agent-1",
+                "aud": "https://api.example.com",
+                "exp": now + 3600,
+                "iat": now,
+            }
+        )
         result = check_identity(token, config)
         assert result.ok
         assert result.claims is not None
@@ -74,26 +76,30 @@ class TestCheckIdentity:
 
     def test_untrusted_issuer(self, config):
         now = int(time.time())
-        token = _make_jwt({
-            "iss": "https://evil.example.com",
-            "sub": "agent-1",
-            "aud": "https://api.example.com",
-            "exp": now + 3600,
-            "iat": now,
-        })
+        token = _make_jwt(
+            {
+                "iss": "https://evil.example.com",
+                "sub": "agent-1",
+                "aud": "https://api.example.com",
+                "exp": now + 3600,
+                "iat": now,
+            }
+        )
         result = check_identity(token, config)
         assert not result.ok
         assert result.error_status == 403
         assert "untrusted_issuer" in json.dumps(result.error_body)
 
     def test_expired_token(self, config):
-        token = _make_jwt({
-            "iss": "https://auth.example.com",
-            "sub": "agent-1",
-            "aud": "https://api.example.com",
-            "exp": 1000,
-            "iat": 500,
-        })
+        token = _make_jwt(
+            {
+                "iss": "https://auth.example.com",
+                "sub": "agent-1",
+                "aud": "https://api.example.com",
+                "exp": 1000,
+                "iat": 500,
+            }
+        )
         result = check_identity(token, config)
         assert not result.ok
         assert result.error_status == 401
@@ -118,14 +124,16 @@ class TestCheckIdentity:
 
     def test_authz_policy_denied(self, config):
         now = int(time.time())
-        token = _make_jwt({
-            "iss": "https://auth.example.com",
-            "sub": "agent-1",
-            "aud": "https://api.example.com",
-            "exp": now + 3600,
-            "iat": now,
-            "scope": "read",
-        })
+        token = _make_jwt(
+            {
+                "iss": "https://auth.example.com",
+                "sub": "agent-1",
+                "aud": "https://api.example.com",
+                "exp": now + 3600,
+                "iat": now,
+                "scope": "read",
+            }
+        )
         policies = [
             AgentAuthzPolicyRuntime(
                 name="require-write",
@@ -133,8 +141,10 @@ class TestCheckIdentity:
             )
         ]
         result = check_identity(
-            token, config,
-            method="POST", path="/api/data",
+            token,
+            config,
+            method="POST",
+            path="/api/data",
             runtime_policies=policies,
         )
         assert not result.ok

@@ -33,7 +33,9 @@ async def check_content_type(config: ScanConfig) -> CheckResult:
 
     if not has_media_type:
         base.message = "No Content-Type header in response"
-        base.suggestion = "Always include Content-Type headers so agents know how to parse responses"
+        base.suggestion = (
+            "Always include Content-Type headers so agents know how to parse responses"
+        )
         base.details = details
         return base
 

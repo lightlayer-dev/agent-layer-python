@@ -29,6 +29,7 @@ from agent_layer.django.rate_limits import RateLimitsMiddleware
 
 # ── Tests ───────────────────────────────────────────────────────────────
 
+
 class TestAgentErrorsMiddleware(TestCase):
     def test_agent_error_returns_envelope(self):
         middleware = AgentErrorsMiddleware(lambda r: JsonResponse({}))
@@ -36,17 +37,19 @@ class TestAgentErrorsMiddleware(TestCase):
         request = factory.get("/fail")
 
         # Simulate process_exception
-        resp = middleware.process_exception(request, AgentError(
-            AgentErrorOptions(code="broken", message="It broke", status=500)
-        ))
+        resp = middleware.process_exception(
+            request, AgentError(AgentErrorOptions(code="broken", message="It broke", status=500))
+        )
         self.assertEqual(resp.status_code, 500)
         import json
+
         data = json.loads(resp.content)
         self.assertEqual(data["error"]["code"], "broken")
         self.assertTrue(data["error"]["is_retriable"])
 
     def test_404_returns_envelope(self):
         from django.http import HttpResponseNotFound
+
         middleware = AgentErrorsMiddleware(lambda r: HttpResponseNotFound())
         factory = RequestFactory()
         request = factory.get("/nonexistent")
@@ -54,6 +57,7 @@ class TestAgentErrorsMiddleware(TestCase):
         resp = middleware(request)
         self.assertEqual(resp.status_code, 404)
         import json
+
         data = json.loads(resp.content)
         self.assertEqual(data["error"]["code"], "not_found")
 
@@ -92,6 +96,7 @@ class TestDiscoveryViews(TestCase):
         resp = self.client.get("/.well-known/ai")
         self.assertEqual(resp.status_code, 200)
         import json
+
         data = json.loads(resp.content)
         self.assertEqual(data["name"], "Test API")
 
@@ -99,5 +104,6 @@ class TestDiscoveryViews(TestCase):
         resp = self.client.get("/json-ld")
         self.assertEqual(resp.status_code, 200)
         import json
+
         data = json.loads(resp.content)
         self.assertEqual(data["@type"], "WebAPI")

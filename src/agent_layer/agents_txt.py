@@ -206,9 +206,7 @@ def _path_matches(path: str, pattern: str) -> bool:
     return path == pattern
 
 
-def _find_matching_rule(
-    rules: list[AgentsTxtRule], agent_name: str
-) -> Optional[AgentsTxtRule]:
+def _find_matching_rule(rules: list[AgentsTxtRule], agent_name: str) -> Optional[AgentsTxtRule]:
     """Find the best matching rule. Priority: exact > prefix pattern > wildcard."""
     wildcard_rule: Optional[AgentsTxtRule] = None
     pattern_rule: Optional[AgentsTxtRule] = None
@@ -227,9 +225,7 @@ def _find_matching_rule(
     return exact_rule or pattern_rule or wildcard_rule
 
 
-def is_agent_allowed(
-    config: AgentsTxtConfig, agent_name: str, path: str
-) -> Optional[bool]:
+def is_agent_allowed(config: AgentsTxtConfig, agent_name: str, path: str) -> Optional[bool]:
     """
     Check whether a given agent + path combination is allowed.
 

@@ -86,14 +86,16 @@ class TestDecodeJwtClaims:
 
 class TestExtractClaims:
     def test_standard_claims(self):
-        claims = extract_claims({
-            "iss": "https://auth.example.com",
-            "sub": "spiffe://example.com/agent/bot",
-            "aud": "https://api.example.com",
-            "exp": 1700000000,
-            "iat": 1699999000,
-            "scope": "read:data write:data",
-        })
+        claims = extract_claims(
+            {
+                "iss": "https://auth.example.com",
+                "sub": "spiffe://example.com/agent/bot",
+                "aud": "https://api.example.com",
+                "exp": 1700000000,
+                "iat": 1699999000,
+                "scope": "read:data write:data",
+            }
+        )
         assert claims.agent_id == "spiffe://example.com/agent/bot"
         assert claims.spiffe_id is not None
         assert claims.spiffe_id.trust_domain == "example.com"
@@ -103,14 +105,16 @@ class TestExtractClaims:
         assert claims.delegated is False
 
     def test_delegation(self):
-        claims = extract_claims({
-            "iss": "https://auth.example.com",
-            "sub": "agent-1",
-            "aud": ["https://api.example.com"],
-            "exp": 1700000000,
-            "iat": 1699999000,
-            "act": {"sub": "user@example.com"},
-        })
+        claims = extract_claims(
+            {
+                "iss": "https://auth.example.com",
+                "sub": "agent-1",
+                "aud": ["https://api.example.com"],
+                "exp": 1700000000,
+                "iat": 1699999000,
+                "act": {"sub": "user@example.com"},
+            }
+        )
         assert claims.delegated is True
         assert claims.delegated_by == "user@example.com"
 
@@ -119,15 +123,19 @@ class TestExtractClaims:
         assert claims.scopes == ["read", "write"]
 
     def test_custom_claims(self):
-        claims = extract_claims({"iss": "test", "sub": "agent", "model": "gpt-4", "provider": "openai"})
+        claims = extract_claims(
+            {"iss": "test", "sub": "agent", "model": "gpt-4", "provider": "openai"}
+        )
         assert claims.custom_claims == {"model": "gpt-4", "provider": "openai"}
 
     def test_agent_id_over_sub(self):
-        claims = extract_claims({
-            "iss": "test",
-            "sub": "service-account-123",
-            "agent_id": "spiffe://example.com/my-agent",
-        })
+        claims = extract_claims(
+            {
+                "iss": "test",
+                "sub": "service-account-123",
+                "agent_id": "spiffe://example.com/my-agent",
+            }
+        )
         assert claims.agent_id == "spiffe://example.com/my-agent"
         assert claims.spiffe_id is not None
         assert claims.spiffe_id.trust_domain == "example.com"
@@ -294,7 +302,9 @@ class TestEvaluateAuthz:
 
     def test_filters_by_agent_pattern(self):
         policies = [
-            AgentAuthzPolicyRuntime(name="weather-agents", agent_pattern="spiffe://example.com/agent/weather-*"),
+            AgentAuthzPolicyRuntime(
+                name="weather-agents", agent_pattern="spiffe://example.com/agent/weather-*"
+            ),
         ]
         result = evaluate_authz(self.CLAIMS, self.CTX, policies)
         assert result.allowed is True
@@ -317,7 +327,9 @@ class TestBuildAuditEvent:
     def test_builds_complete_event(self):
         claims = AgentIdentityClaims(
             agent_id="spiffe://example.com/bot",
-            spiffe_id=SpiffeId(trust_domain="example.com", path="/bot", raw="spiffe://example.com/bot"),
+            spiffe_id=SpiffeId(
+                trust_domain="example.com", path="/bot", raw="spiffe://example.com/bot"
+            ),
             issuer="https://auth.example.com",
             subject="bot",
             audience=["https://api.example.com"],

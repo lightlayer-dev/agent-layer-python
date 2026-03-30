@@ -37,8 +37,6 @@ def generate_json_ld(config: DiscoveryConfig) -> dict[str, Any]:
         }
 
     if m.capabilities:
-        json_ld["potentialAction"] = [
-            {"@type": "Action", "name": cap} for cap in m.capabilities
-        ]
+        json_ld["potentialAction"] = [{"@type": "Action", "name": cap} for cap in m.capabilities]
 
     return json_ld

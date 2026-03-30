@@ -92,6 +92,7 @@ def test_ag_ui_stream_thread_id_from_body(app):
 
 def test_ag_ui_stream_error_handling():
     """Test that handler errors produce RUN_ERROR events."""
+
     def handler(request, emit):
         emit.run_started()
         raise ValueError("Something went wrong")

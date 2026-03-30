@@ -19,7 +19,10 @@ from agent_layer.fastapi.api_keys import api_key_dependency
 from agent_layer.fastapi.oauth2 import oauth2_routes
 from agent_layer.fastapi.robots_txt import robots_txt_routes
 from agent_layer.fastapi.security_headers import security_headers_middleware
-from agent_layer.fastapi.agent_onboarding import agent_onboarding_routes, agent_onboarding_auth_middleware
+from agent_layer.fastapi.agent_onboarding import (
+    agent_onboarding_routes,
+    agent_onboarding_auth_middleware,
+)
 from agent_layer.fastapi.app import configure_agent_layer
 
 __all__ = [

@@ -26,7 +26,11 @@ async def check_llms_txt(config: ScanConfig) -> CheckResult:
             text = res.text
             has_structure = "#" in text or ">" in text
             found.append({"path": path, "length": len(text), "hasStructure": has_structure})
-            details[path] = {"status": res.status_code, "length": len(text), "hasStructure": has_structure}
+            details[path] = {
+                "status": res.status_code,
+                "length": len(text),
+                "hasStructure": has_structure,
+            }
         else:
             details[path] = {"status": res.status_code if res else 0, "found": False}
 
@@ -55,6 +59,8 @@ async def check_llms_txt(config: ScanConfig) -> CheckResult:
     base.severity = "pass" if base.score >= 8 else "warn"
     base.message = "; ".join(notes)
     if base.score < 10:
-        base.suggestion = "Consider adding both /llms.txt and /llms-full.txt with structured markdown content"
+        base.suggestion = (
+            "Consider adding both /llms.txt and /llms-full.txt with structured markdown content"
+        )
 
     return base

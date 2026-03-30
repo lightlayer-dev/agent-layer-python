@@ -53,9 +53,7 @@ def unified_discovery_urlpatterns(config: UnifiedDiscoveryConfig) -> list:
             response["Cache-Control"] = "public, max-age=3600"
             return response
 
-        patterns.append(
-            path(".well-known/agent.json", agent_card, name="unified_agent_card")
-        )
+        patterns.append(path(".well-known/agent.json", agent_card, name="unified_agent_card"))
 
     if config.formats.agents_txt:
 

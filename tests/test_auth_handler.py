@@ -55,9 +55,7 @@ class TestBuildWwwAuthenticate:
         assert result == 'Bearer realm="api"'
 
     def test_with_scopes(self):
-        result = build_www_authenticate(
-            "api", {"read": "Read access", "write": "Write access"}
-        )
+        result = build_www_authenticate("api", {"read": "Read access", "write": "Write access"})
         assert 'Bearer realm="api"' in result
         assert "scope=" in result
         assert "read" in result
@@ -100,9 +98,7 @@ class TestCheckRequireAuth:
         assert "agent-layer" in result.www_authenticate
 
     def test_envelope_has_docs_url(self):
-        config = AgentAuthConfig(
-            authorization_url="https://auth.example.com/authorize"
-        )
+        config = AgentAuthConfig(authorization_url="https://auth.example.com/authorize")
         result = check_require_auth(config, None)
         assert result.envelope is not None
         assert result.envelope.docs_url == "https://auth.example.com/authorize"

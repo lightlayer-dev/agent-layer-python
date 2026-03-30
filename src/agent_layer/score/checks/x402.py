@@ -6,8 +6,11 @@ from ..types import CheckResult, ScanConfig
 from .utils import safe_fetch, resolve_url
 
 X402_HEADERS = [
-    "x-payment-address", "x-payment-network", "x-payment-amount",
-    "x-payment-currency", "x-payment-required",
+    "x-payment-address",
+    "x-payment-network",
+    "x-payment-amount",
+    "x-payment-currency",
+    "x-payment-required",
 ]
 
 

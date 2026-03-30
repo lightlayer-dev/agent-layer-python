@@ -16,20 +16,31 @@ def main() -> None:
         description="Score any API or website for agent-readiness — like Lighthouse for AI agents",
     )
     parser.add_argument("url", help="URL to score")
-    parser.add_argument("--json", action="store_true", dest="json_output", help="Output results as JSON")
+    parser.add_argument(
+        "--json", action="store_true", dest="json_output", help="Output results as JSON"
+    )
     parser.add_argument("--badge", action="store_true", help="Output a shields.io badge URL")
-    parser.add_argument("--timeout", type=int, default=10000, help="Request timeout in ms (default: 10000)")
-    parser.add_argument("--threshold", type=int, default=20, help="Minimum score (0-100). Exit 1 if below threshold.")
+    parser.add_argument(
+        "--timeout", type=int, default=10000, help="Request timeout in ms (default: 10000)"
+    )
+    parser.add_argument(
+        "--threshold",
+        type=int,
+        default=20,
+        help="Minimum score (0-100). Exit 1 if below threshold.",
+    )
     parser.add_argument("--user-agent", type=str, default=None, help="Custom User-Agent string")
 
     args = parser.parse_args()
 
     try:
-        report = asyncio.run(scan(
-            args.url,
-            timeout_s=args.timeout / 1000,
-            user_agent=args.user_agent,
-        ))
+        report = asyncio.run(
+            scan(
+                args.url,
+                timeout_s=args.timeout / 1000,
+                user_agent=args.user_agent,
+            )
+        )
 
         if args.json_output:
             print(format_json(report))

@@ -119,9 +119,13 @@ class TestAgentReadyServer:
         """Agent-ready server should score >= 60."""
         report = await scan(agent_ready_server, timeout_s=10.0)
         print(f"\n  Agent-ready server score: {report.score}/100")
-        print(f"  Checks passed: {sum(1 for c in report.checks if c.severity == 'pass')}/{len(report.checks)}")
+        print(
+            f"  Checks passed: {sum(1 for c in report.checks if c.severity == 'pass')}/{len(report.checks)}"
+        )
         for check in report.checks:
-            print(f"    [{check.severity:4s}] {check.name}: {check.score}/{check.max_score} — {check.message}")
+            print(
+                f"    [{check.severity:4s}] {check.name}: {check.score}/{check.max_score} — {check.message}"
+            )
         assert report.score >= 55, f"Expected >= 55, got {report.score}"
 
     @pytest.mark.asyncio
@@ -170,9 +174,13 @@ class TestBareServer:
         """Bare server should score <= 25."""
         report = await scan(bare_server, timeout_s=10.0)
         print(f"\n  Bare server score: {report.score}/100")
-        print(f"  Checks passed: {sum(1 for c in report.checks if c.severity == 'pass')}/{len(report.checks)}")
+        print(
+            f"  Checks passed: {sum(1 for c in report.checks if c.severity == 'pass')}/{len(report.checks)}"
+        )
         for check in report.checks:
-            print(f"    [{check.severity:4s}] {check.name}: {check.score}/{check.max_score} — {check.message}")
+            print(
+                f"    [{check.severity:4s}] {check.name}: {check.score}/{check.max_score} — {check.message}"
+            )
         assert report.score <= 25, f"Expected <= 25, got {report.score}"
 
     @pytest.mark.asyncio
@@ -180,7 +188,9 @@ class TestBareServer:
         """Bare server should fail discovery checks."""
         report = await scan(bare_server, timeout_s=10.0)
         discovery_checks = [c for c in report.checks if "discovery" in c.id.lower()]
-        assert all(c.severity != "pass" for c in discovery_checks), "Discovery should fail on bare server"
+        assert all(c.severity != "pass" for c in discovery_checks), (
+            "Discovery should fail on bare server"
+        )
 
     @pytest.mark.asyncio
     async def test_bare_no_llms_txt(self, bare_server):
@@ -197,5 +207,7 @@ class TestScannerComparison:
         ready_report = await scan(agent_ready_server, timeout_s=10.0)
         bare_report = await scan(bare_server, timeout_s=10.0)
         gap = ready_report.score - bare_report.score
-        print(f"\n  Score comparison: agent-ready={ready_report.score} vs bare={bare_report.score} (gap={gap})")
+        print(
+            f"\n  Score comparison: agent-ready={ready_report.score} vs bare={bare_report.score} (gap={gap})"
+        )
         assert gap >= 35, f"Expected gap >= 35, got {gap}"

@@ -24,6 +24,7 @@ def discovery_urlpatterns(config: DiscoveryConfig) -> list:
     ]
 
     if config.openapi_spec:
+
         def openapi_spec(request):
             return JsonResponse(config.openapi_spec)
 

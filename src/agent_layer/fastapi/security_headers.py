@@ -29,4 +29,4 @@ class _SecurityHeadersMiddleware(BaseHTTPMiddleware):
 def security_headers_middleware(app: FastAPI, config: SecurityHeadersConfig | None = None) -> None:
     """Add security headers middleware to a FastAPI app."""
     headers = generate_security_headers(config)
-    app.add_middleware(_SecurityHeadersMiddleware, headers=headers)
+    app.add_middleware(_SecurityHeadersMiddleware, headers=headers)  # type: ignore[arg-type]

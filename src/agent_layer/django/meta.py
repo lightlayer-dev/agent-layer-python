@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
@@ -26,7 +26,7 @@ class AgentMetaMiddleware:
         }
     """
 
-    def __init__(self, get_response: object) -> None:
+    def __init__(self, get_response: Callable[..., Any]) -> None:
         self.get_response = get_response
         raw: dict[str, Any] = getattr(settings, "AGENT_LAYER_META", {})
         self.config = AgentMetaConfig(**raw)

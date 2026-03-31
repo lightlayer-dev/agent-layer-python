@@ -22,7 +22,7 @@ Or programmatic::
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Callable
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
@@ -50,7 +50,7 @@ def get_analytics_instance() -> AnalyticsInstance:
 class AgentAnalyticsMiddleware:
     """Django middleware that detects AI agent traffic and collects analytics."""
 
-    def __init__(self, get_response: object) -> None:
+    def __init__(self, get_response: Callable[..., Any]) -> None:
         self.get_response = get_response
         self.analytics = get_analytics_instance()
 

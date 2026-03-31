@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, Callable
+
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse
 
@@ -33,7 +35,7 @@ class X402PaymentMiddleware:
         }
     """
 
-    def __init__(self, get_response: object) -> None:
+    def __init__(self, get_response: Callable[..., Any]) -> None:
         self.get_response = get_response
         x402_settings = getattr(settings, "AGENT_LAYER_X402", {})
         self.config = X402Config(**x402_settings)

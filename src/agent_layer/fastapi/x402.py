@@ -33,6 +33,8 @@ def x402_middleware(config: X402Config):
             return await call_next(request)
 
         if result.action == "payment_required":
+            assert result.payment_required is not None
+            assert result.encoded_header is not None
             return JSONResponse(
                 status_code=402,
                 content=result.payment_required.to_camel(),

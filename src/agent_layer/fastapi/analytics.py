@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import time
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
@@ -52,17 +52,16 @@ def agent_analytics_middleware(
     """
     from fastapi import FastAPI
 
-    if config is None:
-        config = AnalyticsConfig()
+    resolved_config = config if config is not None else AnalyticsConfig()
 
-    instance = create_analytics(config)
+    instance = create_analytics(resolved_config)
 
     class _AnalyticsMiddleware(BaseHTTPMiddleware):
         async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
             user_agent = request.headers.get("user-agent", "")
             agent = instance.detect(user_agent)
 
-            if not agent and not config.track_all:
+            if not agent and not resolved_config.track_all:
                 return await call_next(request)
 
             start = time.monotonic()
@@ -93,11 +92,11 @@ def agent_analytics_middleware(
     existing_lifespan = app.router.lifespan_context
 
     @asynccontextmanager
-    async def _analytics_lifespan(app_: FastAPI) -> AsyncGenerator[dict, None]:  # type: ignore[type-arg]
+    async def _analytics_lifespan(app_: FastAPI) -> AsyncGenerator[dict[str, Any], None]:
         instance.buffer.start_flush_timer()
         if existing_lifespan is not None:
             async with existing_lifespan(app_) as state:
-                yield state or {}
+                yield dict(state) if state else {}
         else:
             yield {}
         await instance.shutdown()

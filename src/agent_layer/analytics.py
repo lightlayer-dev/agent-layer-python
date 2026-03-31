@@ -215,12 +215,15 @@ def create_analytics(config: AnalyticsConfig) -> AnalyticsInstance:
         flush_interval_seconds=config.flush_interval_seconds,
     )
 
+    detect_fn: Callable[[str | None], str | None]
     if config.detect_agent:
         custom = config.detect_agent
 
         def _detect(ua: str | None) -> str | None:
             return custom(ua) if ua else None
-    else:
-        _detect = detect_agent
 
-    return AnalyticsInstance(buffer=buffer, config=config, detect=_detect)
+        detect_fn = _detect
+    else:
+        detect_fn = detect_agent
+
+    return AnalyticsInstance(buffer=buffer, config=config, detect=detect_fn)

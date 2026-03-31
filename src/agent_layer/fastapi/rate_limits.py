@@ -7,6 +7,7 @@ import math
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.responses import Response
 
 from agent_layer.errors import rate_limit_error
 from agent_layer.rate_limits import build_rate_limit_headers, create_rate_limiter
@@ -20,9 +21,10 @@ class RateLimitsMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self._check = create_rate_limiter(config)
 
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         result = await self._check(request)
 
+        response: Response
         if not result.allowed:
             retry_after = result.retry_after or math.ceil(result.reset_ms / 1000)
             envelope = rate_limit_error(retry_after)

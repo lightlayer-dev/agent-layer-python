@@ -17,7 +17,7 @@ Usage in settings.py::
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -33,7 +33,7 @@ from agent_layer.agent_identity import (
 class AgentIdentityMiddleware:
     """Django middleware for agent identity verification."""
 
-    def __init__(self, get_response: object) -> None:
+    def __init__(self, get_response: Callable[..., Any]) -> None:
         self.get_response = get_response
         raw: dict[str, Any] = getattr(settings, "AGENT_IDENTITY", {})
         self.config = AgentIdentityConfig(**raw)

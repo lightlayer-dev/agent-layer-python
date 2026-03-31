@@ -54,7 +54,7 @@ def agent_identity_middleware(
                 if optional:
                     return None
                 decoded = None
-            if decoded is None and verify_token:
+            if decoded is None and verify_token is not None:
                 if optional:
                     return None
                 from agent_layer.errors import format_error

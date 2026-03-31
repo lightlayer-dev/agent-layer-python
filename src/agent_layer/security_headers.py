@@ -41,31 +41,31 @@ def generate_security_headers(config: SecurityHeadersConfig | None = None) -> di
 
     # X-Content-Type-Options
     if config.content_type_options is not False:
-        val = (
+        cto: str = (
             config.content_type_options
             if isinstance(config.content_type_options, str)
             else "nosniff"
         )
-        headers["X-Content-Type-Options"] = val
+        headers["X-Content-Type-Options"] = cto
 
     # X-Frame-Options
     if config.frame_options is not False:
-        val = config.frame_options if isinstance(config.frame_options, str) else "DENY"
-        headers["X-Frame-Options"] = val
+        fo: str = config.frame_options if isinstance(config.frame_options, str) else "DENY"
+        headers["X-Frame-Options"] = fo
 
     # Referrer-Policy
     if config.referrer_policy is not False:
-        val = (
+        rp: str = (
             config.referrer_policy
             if isinstance(config.referrer_policy, str)
             else "strict-origin-when-cross-origin"
         )
-        headers["Referrer-Policy"] = val
+        headers["Referrer-Policy"] = rp
 
     # CSP
     if config.csp is not False:
-        val = config.csp if isinstance(config.csp, str) else "default-src 'self'"
-        headers["Content-Security-Policy"] = val
+        csp: str = config.csp if isinstance(config.csp, str) else "default-src 'self'"
+        headers["Content-Security-Policy"] = csp
 
     # Permissions-Policy
     if config.permissions_policy and isinstance(config.permissions_policy, str):

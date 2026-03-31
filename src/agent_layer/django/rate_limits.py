@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import Any, Callable
 
 from django.http import JsonResponse
 
@@ -21,7 +21,7 @@ class RateLimitsMiddleware:
         AGENT_LAYER_RATE_LIMIT = {"max": 100, "window_ms": 60000}
     """
 
-    def __init__(self, get_response: object) -> None:
+    def __init__(self, get_response: Callable[..., Any]) -> None:
         self.get_response = get_response
         self._check: Any = None
 

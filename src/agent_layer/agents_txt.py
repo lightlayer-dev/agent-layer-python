@@ -110,7 +110,7 @@ def generate_agents_txt(config: AgentsTxtConfig) -> str:
             lines.append(f"Preferred-interface: {rule.preferred_interface}")
 
         if rule.auth:
-            auth_parts = [rule.auth.type]
+            auth_parts: list[str] = [rule.auth.type]
             if rule.auth.endpoint:
                 auth_parts.append(rule.auth.endpoint)
             lines.append(f"Auth: {' '.join(auth_parts)}")

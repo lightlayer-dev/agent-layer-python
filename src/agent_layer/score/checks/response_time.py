@@ -32,6 +32,7 @@ async def check_response_time(config: ScanConfig) -> CheckResult:
     avg = round(sum(times) / len(times))
     details = {"measurements": times, "averageMs": avg}
 
+    severity: str  # will be "pass", "warn", or "fail"
     if avg <= 200:
         score, severity = 10, "pass"
     elif avg <= 500:
@@ -46,7 +47,7 @@ async def check_response_time(config: ScanConfig) -> CheckResult:
         score, severity = 1, "fail"
 
     base.score = score
-    base.severity = severity
+    base.severity = severity  # type: ignore[assignment]
     base.message = f"Average response time: {avg}ms"
     base.details = details
     if score < 8:

@@ -6,7 +6,6 @@ import base64
 import json
 from unittest.mock import AsyncMock
 
-import pytest
 from flask import Flask
 
 from agent_layer.x402 import (

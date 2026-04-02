@@ -9,7 +9,7 @@ Mirrors the TypeScript oauth2-handler.ts in agent-layer-ts.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Awaitable, Callable
+from typing import Awaitable, Callable
 
 from agent_layer.errors import format_error
 from agent_layer.oauth2 import (

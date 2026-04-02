@@ -14,7 +14,6 @@ from typing import Any
 
 from agent_layer.x402 import (
     X402Config,
-    X402RouteConfig,
     FacilitatorClient,
     HttpFacilitatorClient,
     PaymentPayload,

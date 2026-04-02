@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from agent_layer.agent_identity import AgentIdentityConfig, AuthzContext, AgentAuthzPolicy
+from agent_layer.agent_identity import AgentIdentityConfig, AuthzContext
 from agent_layer.identity_handler import (
     IdentityError,
     IdentitySuccess,

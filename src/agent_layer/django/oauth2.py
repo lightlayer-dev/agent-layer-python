@@ -9,7 +9,7 @@ from typing import Any, Callable
 from django.http import JsonResponse
 from django.urls import path
 
-from agent_layer.oauth2 import DecodedAccessToken, OAuth2Config, build_oauth2_metadata
+from agent_layer.oauth2 import OAuth2Config, build_oauth2_metadata
 from agent_layer.oauth2_handler import OAuth2MiddlewareConfig, handle_oauth2
 
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 
 from agent_layer.oauth2 import DecodedAccessToken, OAuth2Config, build_oauth2_metadata
 from agent_layer.oauth2_handler import OAuth2MiddlewareConfig, handle_oauth2

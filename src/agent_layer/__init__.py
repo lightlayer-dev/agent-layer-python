@@ -112,6 +112,33 @@ from agent_layer.oauth2 import (
     refresh_access_token,
     validate_access_token,
 )
+from agent_layer.oauth2_handler import (
+    OAuth2MiddlewareConfig,
+    OAuth2ValidationFailure,
+    OAuth2ValidationSuccess,
+    handle_oauth2,
+)
+from agent_layer.error_handler import (
+    ErrorResponseAction,
+    build_error_envelope,
+    build_error_response,
+    build_not_found_response,
+)
+from agent_layer.identity_handler import (
+    IdentityError,
+    IdentitySuccess,
+    extract_and_verify_token,
+    handle_optional_identity,
+    handle_require_identity,
+)
+from agent_layer.x402_handler import (
+    X402Error,
+    X402FlowResult,
+    X402PaymentRequired,
+    X402Skip,
+    X402Success,
+    handle_x402,
+)
 from agent_layer.auth_handler import (
     RequireAuthResult,
     build_oauth_discovery_document,
@@ -233,6 +260,21 @@ __all__ = [
     "generate_pkce",
     "refresh_access_token",
     "validate_access_token",
+    "ErrorResponseAction",
+    "build_error_envelope",
+    "build_error_response",
+    "build_not_found_response",
+    "IdentityError",
+    "IdentitySuccess",
+    "extract_and_verify_token",
+    "handle_optional_identity",
+    "handle_require_identity",
+    "X402Error",
+    "X402FlowResult",
+    "X402PaymentRequired",
+    "X402Skip",
+    "X402Success",
+    "handle_x402",
     "RequireAuthResult",
     "build_oauth_discovery_document",
     "build_www_authenticate",
